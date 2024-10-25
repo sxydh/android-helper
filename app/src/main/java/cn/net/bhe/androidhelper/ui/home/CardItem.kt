@@ -26,7 +26,8 @@ fun CardItem(card: CardData) {
             .height(100.dp)
             .padding(8.dp),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 8.dp
+            defaultElevation = 6.dp,
+            pressedElevation = 12.dp
         )
     ) {
         Box(
