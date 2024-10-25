@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -21,7 +20,6 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun CardItem(card: CardData) {
     Card(
-        shape = RoundedCornerShape(8.dp),
         modifier = Modifier
             .fillMaxWidth()
             .height(100.dp)
@@ -30,7 +28,7 @@ fun CardItem(card: CardData) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFBA9724)),
+                .background(Color(card.color)),
             contentAlignment = Alignment.Center
         ) {
             Text(

@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun HomeScreen() {
     val cardList = listOf(
-        CardData("文件服务器", ""),
+        CardData("文件服务器", "", 0xFFBA9724),
     )
 
     Column(
