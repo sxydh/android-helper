@@ -1,6 +1,6 @@
 package cn.net.bhe.androidhelper.ui.home
 
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,14 +22,15 @@ import androidx.compose.ui.unit.dp
 fun CardItem(card: CardData) {
     Card(
         shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(1.dp, Color.LightGray),
         modifier = Modifier
             .fillMaxWidth()
             .height(100.dp)
             .padding(8.dp)
     ) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFFBA9724)),
             contentAlignment = Alignment.Center
         ) {
             Text(
