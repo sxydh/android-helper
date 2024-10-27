@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun HomeScreen() {
     val cardList = listOf(
-        CardData("文件服务器", "", 0xFFBA9724),
+        CardViewModel("文件服务器", "", 0xFFBA9724),
     )
 
     Column(
@@ -42,7 +42,7 @@ fun HomeScreen() {
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(cardList.size) { index ->
-                CardItem(card = cardList[index])
+                HomeCard(cardViewModel = cardList[index])
             }
         }
     }
