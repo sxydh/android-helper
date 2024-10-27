@@ -11,6 +11,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,7 +20,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun CardItem(card: CardData) {
+fun HomeCard(cardViewModel: CardViewModel) {
+
+    val title by cardViewModel.title
+    val color by cardViewModel.color
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -33,11 +38,11 @@ fun CardItem(card: CardData) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(card.color)),
+                .background(Color(color)),
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = card.title,
+                text = title,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
