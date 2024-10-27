@@ -10,10 +10,6 @@ import java.util.Base64
 
 object FileServerUtils {
 
-    fun build(port: Int): FileServer {
-        return build(port, FlUtils.combine(FlUtils.getRootTmp(), "ROOT"))
-    }
-
     fun build(port: Int, root: String): FileServer {
         return build("localhost", port, root)
     }
