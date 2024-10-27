@@ -53,7 +53,7 @@ open class FileServer(host: String, port: Int, private val root: String, private
             return true
         }
 
-        val authorization = session.headers["Authorization"] ?: return false
+        val authorization = session.headers["authorization"] ?: return false
         if (authorization.isEmpty()) {
             return false
         }
