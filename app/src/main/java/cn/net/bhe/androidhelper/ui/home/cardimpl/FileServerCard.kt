@@ -1,12 +1,17 @@
 package cn.net.bhe.androidhelper.ui.home.cardimpl
 
 import cn.net.bhe.androidhelper.ui.home.CardViewModel
+import cn.net.bhe.mutil.FlUtils
 
 class FileServerCard : CardViewModel("文件服务器", "", INACTIVE) {
 
-
     override fun onClick() {
-        updateColor(if (color.longValue == INACTIVE) ACTIVE else INACTIVE)
+        if (color.longValue == INACTIVE) {
+            updateColor(ACTIVE)
+        } else {
+            updateColor(INACTIVE)
+        }
+        println(FlUtils.getRoot())
     }
 
     companion object {
