@@ -1,6 +1,7 @@
 package cn.net.bhe.androidhelper.ui.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,7 +30,10 @@ fun CardView(cardViewModel: CardViewModel) {
         modifier = Modifier
             .fillMaxWidth()
             .height(100.dp)
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable {
+                cardViewModel.onClick()
+            },
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp,
             pressedElevation = 12.dp

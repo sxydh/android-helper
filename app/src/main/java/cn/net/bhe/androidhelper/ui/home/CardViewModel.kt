@@ -18,4 +18,8 @@ class CardViewModel(title: String, description: String, color: Long) : ViewModel
         color.longValue = newValue
     }
 
+    fun onClick() {
+
+    }
+
 }
