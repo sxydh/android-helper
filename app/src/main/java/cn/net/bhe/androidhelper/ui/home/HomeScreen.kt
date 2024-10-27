@@ -14,12 +14,13 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cn.net.bhe.androidhelper.ui.home.cardimpl.FileServerCard
 
 
 @Composable
 fun HomeScreen() {
     val cardList = listOf(
-        CardViewModel("文件服务器", "", 0xFFBA9724),
+        FileServerCard(),
     )
 
     Column(
