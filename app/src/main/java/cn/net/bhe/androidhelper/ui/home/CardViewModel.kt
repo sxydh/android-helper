@@ -4,7 +4,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 
-class CardViewModel(title: String, description: String, color: Long) : ViewModel() {
+abstract class CardViewModel(title: String, description: String, color: Long) : ViewModel() {
 
     var title = mutableStateOf(title)
     var description = mutableStateOf(description)
@@ -18,8 +18,6 @@ class CardViewModel(title: String, description: String, color: Long) : ViewModel
         color.longValue = newValue
     }
 
-    fun onClick() {
-
-    }
+    abstract fun onClick()
 
 }
