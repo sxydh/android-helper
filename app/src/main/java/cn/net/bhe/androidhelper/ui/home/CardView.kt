@@ -20,7 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun HomeCard(cardViewModel: CardViewModel) {
+fun CardView(cardViewModel: CardViewModel) {
 
     val title by cardViewModel.title
     val color by cardViewModel.color

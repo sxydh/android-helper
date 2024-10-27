@@ -42,7 +42,7 @@ fun HomeScreen() {
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(cardList.size) { index ->
-                HomeCard(cardViewModel = cardList[index])
+                CardView(cardViewModel = cardList[index])
             }
         }
     }
