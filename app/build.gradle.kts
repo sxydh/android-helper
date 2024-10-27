@@ -48,6 +48,8 @@ android {
 
 dependencies {
 
+    implementation(project(":utils"))
+
     implementation(libs.m.util)
 
     implementation(libs.androidx.core.ktx)
