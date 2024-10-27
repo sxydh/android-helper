@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "AndroidHelper"
 include(":app")
+include(":utils")
