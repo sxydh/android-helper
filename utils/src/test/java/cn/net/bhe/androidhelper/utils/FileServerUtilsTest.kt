@@ -9,7 +9,7 @@ class FileServerUtilsTest {
     fun build() {
         val root = FlUtils.combine(FlUtils.getRootTmp(), "ROOT")
         FlUtils.mkdir(root)
-        val fileServer = FileServerUtils.build(50, root)
+        val fileServer = FileServerUtils.build("localhost", 50, root, "admin", "123")
         fileServer.start()
     }
 }
