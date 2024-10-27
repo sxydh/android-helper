@@ -8,23 +8,23 @@ import java.io.File
 import java.nio.charset.StandardCharsets
 import java.util.Base64
 
-object FileServerUtils {
+open class FileServer private constructor(host: String, port: Int, private val root: String, private val username: String, private val password: String) : NanoHTTPD(host, port) {
 
-    fun build(port: Int, root: String): FileServer {
-        return build("localhost", port, root)
+    companion object {
+
+        fun build(port: Int, root: String): FileServer {
+            return build("localhost", port, root)
+        }
+
+        fun build(host: String, port: Int, root: String): FileServer {
+            return build(host, port, root, StrUtils.EMPTY, StrUtils.EMPTY)
+        }
+
+        fun build(host: String, port: Int, root: String, username: String, password: String): FileServer {
+            return FileServer(host, port, root, username, password)
+        }
+
     }
-
-    fun build(host: String, port: Int, root: String): FileServer {
-        return build(host, port, root, StrUtils.EMPTY, StrUtils.EMPTY)
-    }
-
-    fun build(host: String, port: Int, root: String, username: String, password: String): FileServer {
-        return FileServer(host, port, root, username, password)
-    }
-
-}
-
-open class FileServer(host: String, port: Int, private val root: String, private val username: String, private val password: String) : NanoHTTPD(host, port) {
 
     override fun serve(session: IHTTPSession): Response {
         if (!authenticateUser(session)) {
