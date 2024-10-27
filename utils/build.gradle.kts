@@ -32,6 +32,7 @@ android {
 dependencies {
 
     implementation(libs.m.util)
+    implementation(libs.nanohttpd)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
