@@ -21,6 +21,11 @@ class FileServerCard(activity: MainActivity) : CardViewModel("文件服务器", 
     private val activityRef: WeakReference<MainActivity> = WeakReference(activity)
     private val fileServer: FileServerUtils.FileServer = FileServerUtils.build("0.0.0.0", 15000, "/storage/emulated/0/Download/ROOT", "", "")
 
+    init {
+        val ip = IPUtils.getLanIP(activity)
+        updateDescription(ip ?: StrUtils.EMPTY)
+    }
+
     override fun onClick() {
         val activity = activityRef.get() ?: return
         if (!hasPermission()) {
@@ -29,14 +34,11 @@ class FileServerCard(activity: MainActivity) : CardViewModel("文件服务器", 
         }
 
         if (color.longValue == INACTIVE) {
-            val ip = IPUtils.getLanIP(activity) ?: return
             fileServer.start()
             updateColor(ACTIVE)
-            updateDescription(ip)
         } else {
             fileServer.stop()
             updateColor(INACTIVE)
-            updateDescription(StrUtils.EMPTY)
         }
     }
 
