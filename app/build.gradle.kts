@@ -50,6 +50,7 @@ dependencies {
 
     implementation(project(":utils"))
 
+    implementation(libs.nanohttpd)
     implementation(libs.m.util)
 
     implementation(libs.androidx.core.ktx)
