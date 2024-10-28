@@ -7,7 +7,7 @@ import java.net.InetAddress
 
 object IPUtils {
 
-    fun getLanIp(context: Context): String? {
+    fun getLanIP(context: Context): String? {
 
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork = connectivityManager.activeNetwork ?: return null
