@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AndroidHelperTheme {
                 Surface {
-                    HomeScreen()
+                    HomeScreen(this)
                 }
             }
         }
