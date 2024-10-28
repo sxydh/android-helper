@@ -24,22 +24,26 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        init()
-        setContent {
-            AndroidHelperTheme {
-                Surface {
-                    HomeScreen(this)
-                }
-            }
-        }
+        initActivityResultLauncher()
+        initContent()
     }
 
-    private fun init() {
+    private fun initActivityResultLauncher() {
         activityResultLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
             if (result.resultCode == RESULT_OK) {
                 Log.d(TAG, result.toString())
+            }
+        }
+    }
+
+    private fun initContent() {
+        setContent {
+            AndroidHelperTheme {
+                Surface {
+                    HomeScreen(this)
+                }
             }
         }
     }
