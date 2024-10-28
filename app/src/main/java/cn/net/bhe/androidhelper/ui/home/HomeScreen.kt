@@ -1,5 +1,6 @@
 package cn.net.bhe.androidhelper.ui.home
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,9 +19,9 @@ import cn.net.bhe.androidhelper.ui.home.cardimpl.FileServerCard
 
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(activity: ComponentActivity) {
     val cardList = listOf(
-        FileServerCard(),
+        FileServerCard(activity),
     )
 
     Column(
