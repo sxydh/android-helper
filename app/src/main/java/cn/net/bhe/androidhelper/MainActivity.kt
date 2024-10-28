@@ -22,15 +22,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        activityResultLauncher = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            if (result.resultCode == RESULT_OK) {
-                Log.d(TAG, result.toString())
-            }
-        }
-
         enableEdgeToEdge()
+
+        init()
         setContent {
             AndroidHelperTheme {
                 Surface {
@@ -39,4 +33,19 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    private fun init() {
+        activityResultLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            if (result.resultCode == RESULT_OK) {
+                Log.d(TAG, result.toString())
+            }
+        }
+    }
+
+    fun getActivityResultLauncher(): ActivityResultLauncher<Intent>? {
+        return activityResultLauncher
+    }
+
 }
