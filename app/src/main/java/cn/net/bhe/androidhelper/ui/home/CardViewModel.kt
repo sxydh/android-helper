@@ -10,11 +10,11 @@ abstract class CardViewModel(title: String, description: String, color: Long) : 
     open val description = mutableStateOf(description)
     open val color = mutableLongStateOf(color)
 
-    fun updateDescription(newValue: String) {
+    open fun updateDescription(newValue: String) {
         description.value = newValue
     }
 
-    fun updateColor(newValue: Long) {
+    open fun updateColor(newValue: Long) {
         color.longValue = newValue
     }
 
