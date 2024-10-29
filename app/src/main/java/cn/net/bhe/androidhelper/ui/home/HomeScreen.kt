@@ -15,13 +15,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cn.net.bhe.androidhelper.MainActivity
-import cn.net.bhe.androidhelper.ui.home.cardimpl.FileServerCard
+import cn.net.bhe.androidhelper.ui.home.impl.FileServerImpl
 
 
 @Composable
 fun HomeScreen(activity: MainActivity) {
-    val cardList = listOf(
-        FileServerCard(activity),
+    val implList = listOf(
+        FileServerImpl(activity),
     )
 
     Column(
@@ -43,8 +43,8 @@ fun HomeScreen(activity: MainActivity) {
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(cardList.size) { index ->
-                CardView(cardViewModel = cardList[index])
+            items(implList.size) { index ->
+                CardView(cardViewModel = implList[index])
             }
         }
     }
