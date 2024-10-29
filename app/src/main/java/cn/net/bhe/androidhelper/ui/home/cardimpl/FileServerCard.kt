@@ -21,12 +21,12 @@ class FileServerCard(activity: MainActivity) : CardViewModel("文件服务器", 
 
     private val username: String = StrUtils.randomEn(3)
     private val password: String = StrUtils.randomNum(6)
-    private val activityRef: WeakReference<MainActivity> = WeakReference(activity)
+    private val ip = IPUtils.getLanIP(activity)
     private val fileServer: FileServerUtils.FileServer = FileServerUtils.build("0.0.0.0", PORT, "/storage/emulated/0/Download/ROOT", username, password)
+    private val activityRef: WeakReference<MainActivity> = WeakReference(activity)
 
     init {
-        val ip = IPUtils.getLanIP(activity)
-        updateDescription("${ip ?: StrUtils.EMPTY}:$PORT${System.lineSeparator()}$username:$password")
+        updateDescription(ip ?: StrUtils.EMPTY)
     }
 
     override fun onClick() {
@@ -39,6 +39,7 @@ class FileServerCard(activity: MainActivity) : CardViewModel("文件服务器", 
         if (color.longValue == INACTIVE) {
             fileServer.start()
             updateColor(ACTIVE)
+            updateDescription("${ip ?: StrUtils.EMPTY}:$PORT${System.lineSeparator()}$username:$password")
         } else {
             fileServer.stop()
             updateColor(INACTIVE)
