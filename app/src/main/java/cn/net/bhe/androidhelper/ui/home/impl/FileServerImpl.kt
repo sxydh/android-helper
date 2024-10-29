@@ -42,7 +42,7 @@ class FileServerImpl(activity: MainActivity) : CardViewModel() {
     }
 
     private fun getDescription(): String {
-        return if (COLOR == ACTIVE_COLOR) "$IP:$PORT${System.lineSeparator()}$USERNAME:$USERNAME" else "$IP"
+        return if (COLOR == ACTIVE_COLOR) "$IP:$PORT${System.lineSeparator()}$USERNAME:$PASSWORD" else "$IP"
     }
 
     override fun updateDescription(newValue: String) {
