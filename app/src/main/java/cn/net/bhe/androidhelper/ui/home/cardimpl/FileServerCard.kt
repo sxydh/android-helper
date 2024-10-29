@@ -4,6 +4,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Environment
 import android.provider.Settings
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import cn.net.bhe.androidhelper.MainActivity
 import cn.net.bhe.androidhelper.ui.home.CardViewModel
 import cn.net.bhe.androidhelper.utils.FileServerUtils
@@ -17,7 +19,15 @@ class FileServerCard(activity: MainActivity) : CardViewModel("文件服务器", 
         const val ACTIVE = 0xFF1AEA0B
         const val INACTIVE = 0xFFFF9C1D
         const val PORT = 34567
+
+        var TITLE: String = StrUtils.EMPTY
+        var DESCRIPTION: String = StrUtils.EMPTY
+        var COLOR: Long = INACTIVE
     }
+
+    override val title = mutableStateOf(TITLE)
+    override val description = mutableStateOf(DESCRIPTION)
+    override val color = mutableLongStateOf(COLOR)
 
     private val ip = IPUtils.getLanIP(activity) ?: StrUtils.EMPTY
     private var fileServer: FileServerUtils.FileServer? = null
