@@ -35,12 +35,14 @@ class FileServerCard(activity: MainActivity) : CardViewModel("文件服务器", 
         }
 
         if (color.longValue == INACTIVE) {
-            val username = StrUtils.randomEn(3)
-            val password = StrUtils.randomNum(6)
-            fileServer = FileServerUtils.build("0.0.0.0", PORT, "/storage/emulated/0/Download/ROOT", username, password)
-            fileServer?.start()?.let {
-                updateColor(ACTIVE)
-                updateDescription("$ip:$PORT${System.lineSeparator()}$username:$password")
+            if (StrUtils.isNotEmpty(ip)) {
+                val username = StrUtils.randomEn(3)
+                val password = StrUtils.randomNum(6)
+                fileServer = FileServerUtils.build("0.0.0.0", PORT, "/storage/emulated/0/Download/ROOT", username, password)
+                fileServer?.start()?.let {
+                    updateColor(ACTIVE)
+                    updateDescription("$ip:$PORT${System.lineSeparator()}$username:$password")
+                }
             }
         } else {
             fileServer?.stop()?.let {
