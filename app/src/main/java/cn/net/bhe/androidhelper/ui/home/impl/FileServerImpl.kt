@@ -16,16 +16,18 @@ import java.lang.ref.WeakReference
 class FileServerImpl(activity: MainActivity) : CardViewModel() {
 
     companion object {
-        const val ACTIVE = 0xFF1AEA0B
-        const val INACTIVE = 0xFFFF9C1D
+        const val ACTIVE_COLOR = 0xFF1AEA0B
+        const val INACTIVE_COLOR = 0xFFFF9C1D
 
         var IP: String? = null
         const val PORT = 34567
+        var USERNAME: String? = null
+        var PASSWORD: String? = null
         var FILE_SERVER: FileServerUtils.FileServer? = null
 
         var TITLE: String = "文件服务器"
         var DESCRIPTION: String = StrUtils.EMPTY
-        var COLOR: Long = INACTIVE
+        var COLOR: Long = INACTIVE_COLOR
     }
 
     override val title = mutableStateOf(TITLE)
@@ -35,9 +37,12 @@ class FileServerImpl(activity: MainActivity) : CardViewModel() {
     private val activityRef: WeakReference<MainActivity> = WeakReference(activity)
 
     init {
-        IP = IPUtils.getLanIP(activity)?.apply {
-            updateDescription(this)
-        }
+        IP = IPUtils.getLanIP(activity)
+        updateDescription(getDescription())
+    }
+
+    private fun getDescription(): String {
+        return if (COLOR == ACTIVE_COLOR) "$IP:$PORT${System.lineSeparator()}$USERNAME:$USERNAME" else "$IP"
     }
 
     override fun updateDescription(newValue: String) {
@@ -57,21 +62,18 @@ class FileServerImpl(activity: MainActivity) : CardViewModel() {
             return
         }
 
-        IP?.let {
-            val ip = it
-            if (color.longValue == INACTIVE) {
-                val username = StrUtils.randomEn(3)
-                val password = StrUtils.randomNum(6)
-                FILE_SERVER = FileServerUtils.build("0.0.0.0", PORT, "/storage/emulated/0/Download/ROOT", username, password)
-                FILE_SERVER?.start()?.let {
-                    updateColor(ACTIVE)
-                    updateDescription("$ip:$PORT${System.lineSeparator()}$username:$password")
-                }
-            } else {
-                FILE_SERVER?.stop()?.let {
-                    updateColor(INACTIVE)
-                    updateDescription(ip)
-                }
+        if (COLOR == INACTIVE_COLOR) {
+            USERNAME = StrUtils.randomEn(3)
+            PASSWORD = StrUtils.randomNum(6)
+            FILE_SERVER = FileServerUtils.build("0.0.0.0", PORT, "/storage/emulated/0/Download/ROOT", USERNAME!!, PASSWORD!!)
+            FILE_SERVER?.start()?.let {
+                updateColor(ACTIVE_COLOR)
+                updateDescription(getDescription())
+            }
+        } else {
+            FILE_SERVER?.stop()?.let {
+                updateColor(INACTIVE_COLOR)
+                updateDescription(getDescription())
             }
         }
     }
