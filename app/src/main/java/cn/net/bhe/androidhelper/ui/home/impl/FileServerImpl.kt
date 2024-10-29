@@ -37,6 +37,16 @@ class FileServerImpl(activity: MainActivity) : CardViewModel() {
         updateDescription(ip)
     }
 
+    override fun updateDescription(newValue: String) {
+        super.updateDescription(newValue)
+        DESCRIPTION = newValue
+    }
+
+    override fun updateColor(newValue: Long) {
+        super.updateColor(newValue)
+        COLOR = newValue
+    }
+
     override fun onClick() {
         val activity = activityRef.get() ?: return
         if (!hasPermission()) {
