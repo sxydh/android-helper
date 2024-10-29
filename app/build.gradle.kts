@@ -44,6 +44,16 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    applicationVariants.all {
+        val variant = this
+        variant.outputs
+            .map { it as com.android.build.gradle.internal.api.BaseVariantOutputImpl }
+            .forEach { output ->
+                val outputFileName = "AndroidHelper.${variant.baseName}.${variant.versionName}.${variant.versionCode}.apk"
+                output.outputFileName = outputFileName
+            }
+    }
 }
 
 dependencies {
