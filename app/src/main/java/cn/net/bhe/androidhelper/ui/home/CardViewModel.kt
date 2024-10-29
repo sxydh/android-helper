@@ -1,14 +1,14 @@
 package cn.net.bhe.androidhelper.ui.home
 
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.MutableLongState
+import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 
-abstract class CardViewModel(title: String, description: String, color: Long) : ViewModel() {
+abstract class CardViewModel : ViewModel() {
 
-    open val title = mutableStateOf(title)
-    open val description = mutableStateOf(description)
-    open val color = mutableLongStateOf(color)
+    abstract val title: MutableState<String>
+    abstract val description: MutableState<String>
+    abstract val color: MutableLongState
 
     open fun updateDescription(newValue: String) {
         description.value = newValue
