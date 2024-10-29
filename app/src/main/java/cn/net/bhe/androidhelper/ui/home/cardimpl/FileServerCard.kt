@@ -19,8 +19,10 @@ class FileServerCard(activity: MainActivity) : CardViewModel("文件服务器", 
         const val PORT = 15000
     }
 
+    private val username: String = StrUtils.randomEn(6)
+    private val password: String = StrUtils.randomNum(6)
     private val activityRef: WeakReference<MainActivity> = WeakReference(activity)
-    private val fileServer: FileServerUtils.FileServer = FileServerUtils.build("0.0.0.0", PORT, "/storage/emulated/0/Download/ROOT", "", "")
+    private val fileServer: FileServerUtils.FileServer = FileServerUtils.build("0.0.0.0", PORT, "/storage/emulated/0/Download/ROOT", username, password)
 
     init {
         val ip = IPUtils.getLanIP(activity)
