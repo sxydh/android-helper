@@ -13,7 +13,7 @@ import cn.net.bhe.androidhelper.utils.IPUtils
 import cn.net.bhe.mutil.StrUtils
 import java.lang.ref.WeakReference
 
-class FileServerImpl(activity: MainActivity) : CardViewModel(TITLE, StrUtils.EMPTY, INACTIVE) {
+class FileServerImpl(activity: MainActivity) : CardViewModel() {
 
     companion object {
         const val ACTIVE = 0xFF1AEA0B
