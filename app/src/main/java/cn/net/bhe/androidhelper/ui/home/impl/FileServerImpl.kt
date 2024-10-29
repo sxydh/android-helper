@@ -18,7 +18,10 @@ class FileServerImpl(activity: MainActivity) : CardViewModel() {
     companion object {
         const val ACTIVE = 0xFF1AEA0B
         const val INACTIVE = 0xFFFF9C1D
+
+        var IP: String? = null
         const val PORT = 34567
+        var FILE_SERVER: FileServerUtils.FileServer? = null
 
         var TITLE: String = "文件服务器"
         var DESCRIPTION: String = StrUtils.EMPTY
@@ -29,12 +32,12 @@ class FileServerImpl(activity: MainActivity) : CardViewModel() {
     override val description = mutableStateOf(DESCRIPTION)
     override val color = mutableLongStateOf(COLOR)
 
-    private val ip = IPUtils.getLanIP(activity) ?: StrUtils.EMPTY
-    private var fileServer: FileServerUtils.FileServer? = null
     private val activityRef: WeakReference<MainActivity> = WeakReference(activity)
 
     init {
-        updateDescription(ip)
+        IP = IPUtils.getLanIP(activity)?.apply {
+            updateDescription(this)
+        }
     }
 
     override fun updateDescription(newValue: String) {
@@ -54,20 +57,21 @@ class FileServerImpl(activity: MainActivity) : CardViewModel() {
             return
         }
 
-        if (color.longValue == INACTIVE) {
-            if (StrUtils.isNotEmpty(ip)) {
+        IP?.let {
+            val ip = it
+            if (color.longValue == INACTIVE) {
                 val username = StrUtils.randomEn(3)
                 val password = StrUtils.randomNum(6)
-                fileServer = FileServerUtils.build("0.0.0.0", PORT, "/storage/emulated/0/Download/ROOT", username, password)
-                fileServer?.start()?.let {
+                FILE_SERVER = FileServerUtils.build("0.0.0.0", PORT, "/storage/emulated/0/Download/ROOT", username, password)
+                FILE_SERVER?.start()?.let {
                     updateColor(ACTIVE)
                     updateDescription("$ip:$PORT${System.lineSeparator()}$username:$password")
                 }
-            }
-        } else {
-            fileServer?.stop()?.let {
-                updateColor(INACTIVE)
-                updateDescription(ip)
+            } else {
+                FILE_SERVER?.stop()?.let {
+                    updateColor(INACTIVE)
+                    updateDescription(ip)
+                }
             }
         }
     }
