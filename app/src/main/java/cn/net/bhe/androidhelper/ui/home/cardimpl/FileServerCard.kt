@@ -16,17 +16,17 @@ class FileServerCard(activity: MainActivity) : CardViewModel("文件服务器", 
     companion object {
         const val ACTIVE = 0xFF1AEA0B
         const val INACTIVE = 0xFFFF9C1D
-        const val PORT = 15000
+        const val PORT = 34567
     }
 
-    private val username: String = StrUtils.randomEn(6)
+    private val username: String = StrUtils.randomEn(3)
     private val password: String = StrUtils.randomNum(6)
     private val activityRef: WeakReference<MainActivity> = WeakReference(activity)
     private val fileServer: FileServerUtils.FileServer = FileServerUtils.build("0.0.0.0", PORT, "/storage/emulated/0/Download/ROOT", username, password)
 
     init {
         val ip = IPUtils.getLanIP(activity)
-        updateDescription("${ip ?: StrUtils.EMPTY}:$PORT")
+        updateDescription("${ip ?: StrUtils.EMPTY}:$PORT${System.lineSeparator()}$username:$password")
     }
 
     override fun onClick() {
