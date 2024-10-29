@@ -1,4 +1,4 @@
-package cn.net.bhe.androidhelper.ui.home.cardimpl
+package cn.net.bhe.androidhelper.ui.home.impl
 
 import android.content.Intent
 import android.net.Uri
@@ -13,14 +13,14 @@ import cn.net.bhe.androidhelper.utils.IPUtils
 import cn.net.bhe.mutil.StrUtils
 import java.lang.ref.WeakReference
 
-class FileServerCard(activity: MainActivity) : CardViewModel("文件服务器", "", INACTIVE) {
+class FileServerImpl(activity: MainActivity) : CardViewModel(TITLE, StrUtils.EMPTY, INACTIVE) {
 
     companion object {
         const val ACTIVE = 0xFF1AEA0B
         const val INACTIVE = 0xFFFF9C1D
         const val PORT = 34567
 
-        var TITLE: String = StrUtils.EMPTY
+        var TITLE: String = "文件服务器"
         var DESCRIPTION: String = StrUtils.EMPTY
         var COLOR: Long = INACTIVE
     }
