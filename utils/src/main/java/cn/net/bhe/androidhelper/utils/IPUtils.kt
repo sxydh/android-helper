@@ -14,7 +14,8 @@ object IPUtils {
         val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return null
 
         if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
-            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+        ) {
             val linkProperties = connectivityManager.getLinkProperties(activeNetwork)
             val linkAddresses = linkProperties?.linkAddresses
             linkAddresses?.forEach { linkAddress ->
