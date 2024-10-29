@@ -77,13 +77,13 @@ object FileServerUtils {
         }
 
         open fun process401(session: IHTTPSession): Response {
-            val response = newFixedLengthResponse(Response.Status.UNAUTHORIZED, "text/plain", StrUtils.EMPTY)
+            val response = newFixedLengthResponse(Response.Status.UNAUTHORIZED, "text/plain", Response.Status.UNAUTHORIZED.name)
             response.addHeader("WWW-Authenticate", "Basic realm=\"MyRealm\"")
             return response
         }
 
         open fun process404(session: IHTTPSession): Response {
-            return newFixedLengthResponse(Response.Status.NOT_FOUND, "text/plain", StrUtils.EMPTY)
+            return newFixedLengthResponse(Response.Status.NOT_FOUND, "text/plain", Response.Status.NOT_FOUND.name)
         }
 
         open fun processDirectory(session: IHTTPSession, directory: File): Response {
