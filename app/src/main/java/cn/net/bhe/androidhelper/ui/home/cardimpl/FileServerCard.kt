@@ -19,10 +19,8 @@ class FileServerCard(activity: MainActivity) : CardViewModel("文件服务器", 
         const val PORT = 34567
     }
 
-    private val username: String = StrUtils.randomEn(3)
-    private val password: String = StrUtils.randomNum(6)
     private val ip = IPUtils.getLanIP(activity) ?: StrUtils.EMPTY
-    private val fileServer: FileServerUtils.FileServer = FileServerUtils.build("0.0.0.0", PORT, "/storage/emulated/0/Download/ROOT", username, password)
+    private var fileServer: FileServerUtils.FileServer? = null
     private val activityRef: WeakReference<MainActivity> = WeakReference(activity)
 
     init {
@@ -37,13 +35,18 @@ class FileServerCard(activity: MainActivity) : CardViewModel("文件服务器", 
         }
 
         if (color.longValue == INACTIVE) {
-            fileServer.start()
-            updateColor(ACTIVE)
-            updateDescription("$ip:$PORT${System.lineSeparator()}$username:$password")
+            val username = StrUtils.randomEn(3)
+            val password = StrUtils.randomNum(6)
+            fileServer = FileServerUtils.build("0.0.0.0", PORT, "/storage/emulated/0/Download/ROOT", username, password)
+            fileServer?.start()?.let {
+                updateColor(ACTIVE)
+                updateDescription("$ip:$PORT${System.lineSeparator()}$username:$password")
+            }
         } else {
-            fileServer.stop()
-            updateColor(INACTIVE)
-            updateDescription(ip)
+            fileServer?.stop()?.let {
+                updateColor(INACTIVE)
+                updateDescription(ip)
+            }
         }
     }
 
