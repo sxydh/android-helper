@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import cn.net.bhe.mutil.StrUtils
 
 @Composable
 fun CardView(cardViewModel: CardViewModel) {
@@ -55,13 +56,15 @@ fun CardView(cardViewModel: CardViewModel) {
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
             )
-            Spacer(Modifier.height(6.dp))
-            Text(
-                text = description,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.bodySmall
-            )
+            if (StrUtils.isNotEmpty(description)) {
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    text = description,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
     }
 }
