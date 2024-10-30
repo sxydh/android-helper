@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cn.net.bhe.androidhelper.MainActivity
+import cn.net.bhe.androidhelper.ui.home.impl.AutoClickImpl
 import cn.net.bhe.androidhelper.ui.home.impl.FileServerImpl
 
 
@@ -22,6 +23,7 @@ import cn.net.bhe.androidhelper.ui.home.impl.FileServerImpl
 fun HomeScreen(activity: MainActivity) {
     val implList = listOf(
         FileServerImpl(activity),
+        AutoClickImpl(activity)
     )
 
     Column(
