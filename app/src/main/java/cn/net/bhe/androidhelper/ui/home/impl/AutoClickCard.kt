@@ -9,12 +9,20 @@ import android.net.Uri
 import android.provider.Settings
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalContext
 import cn.net.bhe.androidhelper.MainActivity
+import cn.net.bhe.androidhelper.ui.home.CardView
 import cn.net.bhe.androidhelper.ui.home.CardViewModel
 import cn.net.bhe.mutil.StrUtils
 import java.lang.ref.WeakReference
+
+@Composable
+fun AutoClickCardView() {
+    CardView(AutoClickCardViewModel(LocalContext.current as MainActivity))
+}
 
 class AutoClickCardViewModel(activity: MainActivity) : CardViewModel() {
 
