@@ -14,18 +14,11 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import cn.net.bhe.androidhelper.MainActivity
-import cn.net.bhe.androidhelper.ui.home.impl.AutoClickImpl
-import cn.net.bhe.androidhelper.ui.home.impl.FileServerCard
+import cn.net.bhe.androidhelper.ui.home.impl.FileServerCardView
 
 
 @Composable
-fun HomeScreen(activity: MainActivity) {
-    val implList = listOf(
-        FileServerCard(activity),
-        AutoClickImpl(activity)
-    )
-
+fun HomeScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -45,9 +38,7 @@ fun HomeScreen(activity: MainActivity) {
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(implList.size) { index ->
-                CardView(cardViewModel = implList[index])
-            }
+            item { FileServerCardView() }
         }
     }
 }
