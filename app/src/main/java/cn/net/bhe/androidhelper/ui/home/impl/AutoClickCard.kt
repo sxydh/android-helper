@@ -16,11 +16,11 @@ import cn.net.bhe.androidhelper.ui.home.CardViewModel
 import cn.net.bhe.mutil.StrUtils
 import java.lang.ref.WeakReference
 
-class AutoClickImpl(activity: MainActivity) : CardViewModel() {
+class AutoClickCardViewModel(activity: MainActivity) : CardViewModel() {
 
     companion object {
-        val TAG: String = AutoClickImpl::class.java.simpleName
-        val BC_ID: String = "${AutoClickImpl::class.java.name}.onClick"
+        val TAG: String = AutoClickCardViewModel::class.java.simpleName
+        val BC_ID: String = "${AutoClickCardViewModel::class.java.name}.onClick"
 
         const val TITLE = "连击器"
         const val DESCRIPTION = StrUtils.EMPTY
@@ -73,7 +73,7 @@ class MyAccessibilityService : AccessibilityService() {
         super.onCreate()
         Log.d(TAG, "onCreate")
 
-        val filter = IntentFilter(AutoClickImpl.BC_ID)
+        val filter = IntentFilter(AutoClickCardViewModel.BC_ID)
         registerReceiver(broadcastReceiver, filter)
     }
 
