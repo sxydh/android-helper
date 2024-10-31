@@ -13,7 +13,7 @@ import cn.net.bhe.androidhelper.utils.IPUtils
 import cn.net.bhe.mutil.StrUtils
 import java.lang.ref.WeakReference
 
-class FileServerImpl(activity: MainActivity) : CardViewModel() {
+class FileServerCard(activity: MainActivity) : CardViewModel() {
 
     companion object {
         const val ACTIVE_COLOR = 0xFF1AEA0B
