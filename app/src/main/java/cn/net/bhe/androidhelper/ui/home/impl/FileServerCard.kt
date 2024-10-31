@@ -4,16 +4,24 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Environment
 import android.provider.Settings
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalContext
 import cn.net.bhe.androidhelper.MainActivity
+import cn.net.bhe.androidhelper.ui.home.CardView
 import cn.net.bhe.androidhelper.ui.home.CardViewModel
 import cn.net.bhe.androidhelper.utils.FileServerUtils
 import cn.net.bhe.androidhelper.utils.IPUtils
 import cn.net.bhe.mutil.StrUtils
 import java.lang.ref.WeakReference
 
-class FileServerCard(activity: MainActivity) : CardViewModel() {
+@Composable
+fun FileServerCardView() {
+    CardView(FileServerCardViewModel(LocalContext.current as MainActivity))
+}
+
+class FileServerCardViewModel(activity: MainActivity) : CardViewModel() {
 
     companion object {
         const val ACTIVE_COLOR = 0xFF1AEA0B
@@ -88,7 +96,7 @@ class FileServerCard(activity: MainActivity) : CardViewModel() {
         val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
             data = Uri.parse("package:${activity.packageName}")
         }
-        activity.getActivityResultLauncher()?.launch(intent)
+        activity.startActivity(intent)
     }
 
 }
