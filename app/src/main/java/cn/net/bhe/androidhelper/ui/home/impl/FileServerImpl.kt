@@ -37,7 +37,9 @@ class FileServerImpl(activity: MainActivity) : CardViewModel() {
     private val activityRef: WeakReference<MainActivity> = WeakReference(activity)
 
     init {
-        IP = IPUtils.getLanIP(activity)
+        activityRef.get()?.let {
+            IP = IPUtils.getLanIP(it)
+        }
         updateDescription(getDescription())
     }
 
