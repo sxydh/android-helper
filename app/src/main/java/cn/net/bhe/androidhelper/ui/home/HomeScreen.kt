@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cn.net.bhe.androidhelper.ui.home.impl.AutoClickCardView
 import cn.net.bhe.androidhelper.ui.home.impl.FileServerCardView
 
 
@@ -39,6 +40,7 @@ fun HomeScreen() {
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item { FileServerCardView() }
+            item { AutoClickCardView() }
         }
     }
 }
