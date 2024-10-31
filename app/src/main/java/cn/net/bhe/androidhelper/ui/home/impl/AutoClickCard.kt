@@ -8,11 +8,23 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.provider.Settings
 import android.util.Log
+import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.setViewTreeLifecycleOwner
+import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import cn.net.bhe.androidhelper.MainActivity
 import cn.net.bhe.androidhelper.ui.home.CardView
 import cn.net.bhe.androidhelper.ui.home.CardViewModel
@@ -21,7 +33,38 @@ import java.lang.ref.WeakReference
 
 @Composable
 fun AutoClickCardView() {
-    CardView(AutoClickCardViewModel(LocalContext.current as MainActivity))
+    val viewModel = AutoClickCardViewModel(LocalContext.current as MainActivity)
+    CardView(viewModel)
+
+    if (viewModel.isOpen.value) {
+        val context = LocalContext.current
+        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val composeView = ComposeView(context).apply {
+            setViewTreeLifecycleOwner(LocalLifecycleOwner.current)
+            setViewTreeSavedStateRegistryOwner(LocalSavedStateRegistryOwner.current)
+            setContent {
+                FloatingActionButton(
+                    onClick = {},
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .size(50.dp)
+                ) {}
+            }
+        }
+
+        val params = WindowManager.LayoutParams(
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+            android.graphics.PixelFormat.TRANSLUCENT
+        )
+
+        params.x = 100
+        params.y = 100
+
+        windowManager.addView(composeView, params)
+    }
 }
 
 class AutoClickCardViewModel(activity: MainActivity) : CardViewModel() {
@@ -38,6 +81,7 @@ class AutoClickCardViewModel(activity: MainActivity) : CardViewModel() {
     override val title = mutableStateOf(TITLE)
     override val description = mutableStateOf(DESCRIPTION)
     override val color = mutableLongStateOf(COLOR)
+    val isOpen = mutableStateOf(false)
 
     private val activityRef: WeakReference<MainActivity> = WeakReference(activity)
 
