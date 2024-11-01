@@ -14,6 +14,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,8 +28,8 @@ import cn.net.bhe.mutil.StrUtils
 fun CardBase(cardData: CardData, onClick: () -> Unit) {
 
     val title = cardData.title
-    val description = cardData.description
-    val color = cardData.color
+    val description by cardData.description
+    val color by cardData.color
 
     Card(
         modifier = Modifier
@@ -66,4 +68,4 @@ fun CardBase(cardData: CardData, onClick: () -> Unit) {
     }
 }
 
-data class CardData(val title: String, var description: String, var color: Long)
+data class CardData(val title: String, var description: MutableState<String>, var color: MutableState<Long>)
