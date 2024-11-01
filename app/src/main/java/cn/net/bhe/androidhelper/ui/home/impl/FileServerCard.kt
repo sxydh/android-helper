@@ -9,7 +9,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalContext
 import cn.net.bhe.androidhelper.MainActivity
-import cn.net.bhe.androidhelper.ui.home.CardBase
+import cn.net.bhe.androidhelper.ui.home.BaseCard
 import cn.net.bhe.androidhelper.ui.home.CardData
 import cn.net.bhe.androidhelper.utils.FileServerUtils
 import cn.net.bhe.androidhelper.utils.IPUtils
@@ -19,7 +19,7 @@ import java.lang.ref.WeakReference
 @Composable
 fun FileServerCard() {
     val cardData = FileServerCardData(LocalContext.current as MainActivity)
-    CardBase(cardData) {
+    BaseCard(cardData) {
         cardData.onClick()
     }
 }
