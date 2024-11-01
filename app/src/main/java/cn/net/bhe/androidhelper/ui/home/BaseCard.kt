@@ -22,14 +22,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
 import cn.net.bhe.mutil.StrUtils
 
 @Composable
-fun BaseCard(cardData: CardData, onClick: () -> Unit) {
+fun BaseCard(cardViewModel: CardViewModel, onClick: () -> Unit) {
 
-    val title = cardData.title
-    val description by cardData.description
-    val color by cardData.color
+    val title = cardViewModel.title
+    val description by cardViewModel.description
+    val color by cardViewModel.color
 
     Card(
         modifier = Modifier
@@ -68,7 +69,7 @@ fun BaseCard(cardData: CardData, onClick: () -> Unit) {
     }
 }
 
-abstract class CardData {
+abstract class CardViewModel : ViewModel() {
 
     abstract val title: String
     abstract val description: MutableState<String>
