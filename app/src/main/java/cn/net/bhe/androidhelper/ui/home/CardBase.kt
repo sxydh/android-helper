@@ -68,4 +68,4 @@ fun CardBase(cardData: CardData, onClick: () -> Unit) {
     }
 }
 
-data class CardData(val title: String, var description: MutableState<String>, var color: MutableState<Long>)
+class CardData(val title: String, var description: MutableState<String>, var color: MutableState<Long>)
