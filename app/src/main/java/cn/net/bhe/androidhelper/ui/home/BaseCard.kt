@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import cn.net.bhe.mutil.StrUtils
 
 @Composable
-fun CardBase(cardData: CardData, onClick: () -> Unit) {
+fun BaseCard(cardData: CardData, onClick: () -> Unit) {
 
     val title = cardData.title
     val description by cardData.description
