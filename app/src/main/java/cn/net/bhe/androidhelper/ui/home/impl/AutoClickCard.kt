@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.provider.Settings
 import android.util.Log
+import android.view.Gravity
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
 import androidx.compose.foundation.background
@@ -143,7 +144,7 @@ class OverlayViewData {
 
     var color = mutableLongStateOf(COLOR)
 
-    fun addView(activity: MainActivity, composeView: ComposeView) {
+    fun addView(activity: MainActivity, composeView: ComposeView, gv: Int = Gravity.CENTER or Gravity.CENTER, xv: Int = 0, yv: Int = 0) {
         val windowManager = activity.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -151,7 +152,11 @@ class OverlayViewData {
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             android.graphics.PixelFormat.TRANSLUCENT
-        )
+        ).apply {
+            gravity = gv
+            x = xv
+            y = yv
+        }
         windowManager.addView(composeView, params)
         VIEW = WeakReference(composeView)
     }
