@@ -179,8 +179,13 @@ class PreViewModel : ViewModel() {
     private val activeColor = 0xFF1AEA0B
     private val inactiveColor = 0xFFFF9C1D
     private var view = WeakReference<ComposeView>(null)
+    private var isOpen = false
+    var shouldOpen: Boolean
+        get() = isOpen
+        set(value) {
+            isOpen = value
+        }
 
-    val isOpen = mutableStateOf(false)
     val color = mutableLongStateOf(inactiveColor)
 
     fun onClick(activity: MainActivity) {
