@@ -59,6 +59,8 @@ android {
 dependencies {
 
     implementation(project(":utils"))
+    // https://mvnrepository.com/artifact/androidx.lifecycle/lifecycle-viewmodel-compose
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
