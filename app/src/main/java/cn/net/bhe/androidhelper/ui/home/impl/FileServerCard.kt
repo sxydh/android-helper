@@ -42,7 +42,6 @@ class FileServerCardViewModel : CardViewModel() {
 
     fun init(activity: MainActivity) {
         ip = IPUtils.getLanIP(activity) ?: StrUtils.EMPTY
-        description.value = getDescription()
     }
 
     private fun getDescription(): String {
