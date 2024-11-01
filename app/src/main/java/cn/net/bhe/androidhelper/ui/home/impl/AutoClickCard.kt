@@ -10,6 +10,7 @@ import android.provider.Settings
 import android.util.Log
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
@@ -18,6 +19,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -40,35 +42,24 @@ fun AutoClickCard() {
     }
 
     if (cardData.color.longValue == AutoClickCardData.ACTIVE_COLOR) {
-        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val composeView = ComposeView(context).apply {
             setViewTreeLifecycleOwner(LocalLifecycleOwner.current)
             setViewTreeSavedStateRegistryOwner(LocalSavedStateRegistryOwner.current)
             setContent {
                 FloatingActionButton(
-                    onClick = {},
+                    onClick = {
+                        cardData.onClickOverlayView(context)
+                    },
                     modifier = Modifier
                         .clip(CircleShape)
                         .size(50.dp)
+                        .background(Color(cardData.overlayViewColor.longValue))
                 ) {}
             }
         }
-
-        val params = WindowManager.LayoutParams(
-            WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-            android.graphics.PixelFormat.TRANSLUCENT
-        )
-
-        windowManager.addView(composeView, params)
-        AutoClickCardData.OVERLAY_VIEW = WeakReference(composeView)
+        cardData.addOverlayView(context, composeView)
     } else {
-        AutoClickCardData.OVERLAY_VIEW.get()?.let {
-            val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-            windowManager.removeView(it)
-        }
+        cardData.removeOverlayView(context)
     }
 }
 
@@ -84,11 +75,13 @@ class AutoClickCardData : CardData() {
         var DESCRIPTION = StrUtils.EMPTY
         var COLOR = INACTIVE_COLOR
         var OVERLAY_VIEW = WeakReference<ComposeView>(null)
+        var OVERLAY_VIEW_COLOR = INACTIVE_COLOR
     }
 
     override val title = TITLE
     override val description = mutableStateOf(DESCRIPTION)
     override val color = mutableLongStateOf(COLOR)
+    val overlayViewColor = mutableLongStateOf(OVERLAY_VIEW_COLOR)
 
     private fun updateColor(newValue: Long) {
         color.longValue = newValue
@@ -106,6 +99,41 @@ class AutoClickCardData : CardData() {
             updateColor(ACTIVE_COLOR)
         } else {
             updateColor(INACTIVE_COLOR)
+        }
+    }
+
+    fun addOverlayView(activity: MainActivity, composeView: ComposeView) {
+        val windowManager = activity.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val params = WindowManager.LayoutParams(
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+            android.graphics.PixelFormat.TRANSLUCENT
+        )
+        windowManager.addView(composeView, params)
+        OVERLAY_VIEW = WeakReference(composeView)
+    }
+
+    private fun updateOverlayViewColor(newValue: Long) {
+        overlayViewColor.longValue = newValue
+        OVERLAY_VIEW_COLOR = newValue
+    }
+
+    fun onClickOverlayView(activity: MainActivity) {
+        Log.d(TAG, "onClickOverlayView")
+
+        if (overlayViewColor.longValue == INACTIVE_COLOR) {
+            updateOverlayViewColor(ACTIVE_COLOR)
+        } else {
+            updateOverlayViewColor(INACTIVE_COLOR)
+        }
+    }
+
+    fun removeOverlayView(activity: MainActivity) {
+        OVERLAY_VIEW.get()?.let {
+            val windowManager = activity.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            windowManager.removeView(it)
         }
     }
 
