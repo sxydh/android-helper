@@ -43,17 +43,17 @@ fun AutoClickCard() {
     BaseCard(cardData) {
         cardData.onClick(context)
     }
-    OverlayView(cardData)
+    PreOverlayView(cardData)
 }
 
 @Composable
-fun OverlayView(cardData: AutoClickCardData) {
+fun PreOverlayView(cardData: AutoClickCardData) {
     val context = LocalContext.current as MainActivity
-    val overlayViewData = OverlayViewData()
+    val preOverlayViewData = PreOverlayViewData()
 
-    overlayViewData.removeView(context)
-    if (cardData.isOpenOverlayView()) {
-        val color by overlayViewData.color
+    preOverlayViewData.removeView(context)
+    if (cardData.isOpenPreOverlayView()) {
+        val color by preOverlayViewData.color
 
         val composeView = ComposeView(context).apply {
             setViewTreeLifecycleOwner(LocalLifecycleOwner.current)
@@ -65,12 +65,12 @@ fun OverlayView(cardData: AutoClickCardData) {
                         .clip(CircleShape)
                         .background(Color(color))
                         .clickable {
-                            overlayViewData.onClick(context)
+                            preOverlayViewData.onClick(context)
                         }
                 ) {}
             }
         }
-        overlayViewData.addView(context, composeView)
+        preOverlayViewData.addView(context, composeView)
     }
 }
 
@@ -125,13 +125,13 @@ class AutoClickCardData : CardData() {
         return true
     }
 
-    fun isOpenOverlayView(): Boolean {
+    fun isOpenPreOverlayView(): Boolean {
         return color.longValue == ACTIVE_COLOR
     }
 
 }
 
-class OverlayViewData {
+class PreOverlayViewData {
 
     companion object {
         val TAG: String = AutoClickCardData::class.java.simpleName
