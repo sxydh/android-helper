@@ -144,28 +144,8 @@ class OverlayViewData {
 
     var color = mutableLongStateOf(COLOR)
 
-    fun addView(
-        activity: MainActivity,
-        composeView: ComposeView,
-        wv: Int = WindowManager.LayoutParams.WRAP_CONTENT,
-        hv: Int = WindowManager.LayoutParams.WRAP_CONTENT,
-        gv: Int = Gravity.CENTER or Gravity.CENTER,
-        xv: Int = 0,
-        yv: Int = 0
-    ) {
-        val windowManager = activity.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        val params = WindowManager.LayoutParams(
-            wv,
-            hv,
-            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-            android.graphics.PixelFormat.TRANSLUCENT
-        ).apply {
-            gravity = gv
-            x = xv
-            y = yv
-        }
-        windowManager.addView(composeView, params)
+    fun addView(activity: MainActivity, composeView: ComposeView) {
+        addViewDo(activity, composeView)
         VIEW = WeakReference(composeView)
     }
 
@@ -239,4 +219,28 @@ class MyAccessibilityService : AccessibilityService() {
         Log.d(TAG, "onReceiveDo")
     }
 
+}
+
+private fun addViewDo(
+    activity: MainActivity,
+    composeView: ComposeView,
+    wv: Int = WindowManager.LayoutParams.WRAP_CONTENT,
+    hv: Int = WindowManager.LayoutParams.WRAP_CONTENT,
+    gv: Int = Gravity.CENTER or Gravity.CENTER,
+    xv: Int = 0,
+    yv: Int = 0
+) {
+    val windowManager = activity.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+    val params = WindowManager.LayoutParams(
+        wv,
+        hv,
+        WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+        android.graphics.PixelFormat.TRANSLUCENT
+    ).apply {
+        gravity = gv
+        x = xv
+        y = yv
+    }
+    windowManager.addView(composeView, params)
 }
