@@ -74,8 +74,4 @@ abstract class CardData {
     abstract val description: MutableState<String>
     abstract val color: MutableState<Long>
 
-    abstract fun updateDescription(newValue: String)
-
-    abstract fun updateColor(newValue: Long)
-
 }
