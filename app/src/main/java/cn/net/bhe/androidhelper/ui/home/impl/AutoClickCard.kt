@@ -77,7 +77,7 @@ class AutoClickCardData : CardData() {
     companion object {
         val TAG: String = AutoClickCardData::class.java.simpleName
         const val ACTIVE_COLOR = 0xFF1AEA0B
-        const val INACTIVE_COLOR = 0xFFFF9C1D
+        const val INACTIVE_COLOR = 0xFF1DFFEC
         val BC_ID: String = "${AutoClickCardData::class.java.name}.onClick"
 
         const val TITLE = "连击器"
