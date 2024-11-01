@@ -17,7 +17,7 @@ import cn.net.bhe.mutil.StrUtils
 import java.lang.ref.WeakReference
 
 @Composable
-fun FileServerCardView() {
+fun FileServerCard() {
     CardBase(FileServerCardViewModel(LocalContext.current as MainActivity))
 }
 

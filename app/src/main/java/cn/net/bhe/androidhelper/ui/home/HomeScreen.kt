@@ -15,7 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cn.net.bhe.androidhelper.ui.home.impl.AutoClickCardView
-import cn.net.bhe.androidhelper.ui.home.impl.FileServerCardView
+import cn.net.bhe.androidhelper.ui.home.impl.FileServerCard
 
 
 @Composable
@@ -39,7 +39,7 @@ fun HomeScreen() {
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            item { FileServerCardView() }
+            item { FileServerCard() }
             item { AutoClickCardView() }
         }
     }
