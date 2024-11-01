@@ -41,7 +41,7 @@ fun AutoClickCard() {
         cardData.onClick(context)
     }
 
-    if (cardData.color.longValue == AutoClickCardData.ACTIVE_COLOR) {
+    if (cardData.isOpenOverlayView()) {
         val composeView = ComposeView(context).apply {
             setViewTreeLifecycleOwner(LocalLifecycleOwner.current)
             setViewTreeSavedStateRegistryOwner(LocalSavedStateRegistryOwner.current)
@@ -100,6 +100,10 @@ class AutoClickCardData : CardData() {
         } else {
             updateColor(INACTIVE_COLOR)
         }
+    }
+
+    fun isOpenOverlayView(): Boolean {
+        return color.longValue == ACTIVE_COLOR
     }
 
     fun addOverlayView(activity: MainActivity, composeView: ComposeView) {
