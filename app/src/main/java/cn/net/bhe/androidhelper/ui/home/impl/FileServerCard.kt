@@ -10,7 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalContext
 import cn.net.bhe.androidhelper.MainActivity
 import cn.net.bhe.androidhelper.ui.home.CardBase
-import cn.net.bhe.androidhelper.ui.home.CardViewModel
+import cn.net.bhe.androidhelper.ui.home.CardData
 import cn.net.bhe.androidhelper.utils.FileServerUtils
 import cn.net.bhe.androidhelper.utils.IPUtils
 import cn.net.bhe.mutil.StrUtils
@@ -18,10 +18,13 @@ import java.lang.ref.WeakReference
 
 @Composable
 fun FileServerCard() {
-    CardBase(FileServerCardViewModel(LocalContext.current as MainActivity))
+    val cardData = FileServerCardData(LocalContext.current as MainActivity)
+    CardBase(cardData) {
+        cardData.onClick()
+    }
 }
 
-class FileServerCardViewModel(activity: MainActivity) : CardViewModel() {
+class FileServerCardData(activity: MainActivity) : CardData() {
 
     companion object {
         const val ACTIVE_COLOR = 0xFF1AEA0B
@@ -38,8 +41,8 @@ class FileServerCardViewModel(activity: MainActivity) : CardViewModel() {
         var COLOR: Long = INACTIVE_COLOR
     }
 
-    override val title = mutableStateOf(TITLE)
-    override val description = mutableStateOf(DESCRIPTION)
+    override val title = TITLE
+    override var description = mutableStateOf(DESCRIPTION)
     override val color = mutableLongStateOf(COLOR)
 
     private val activityRef: WeakReference<MainActivity> = WeakReference(activity)
@@ -55,17 +58,17 @@ class FileServerCardViewModel(activity: MainActivity) : CardViewModel() {
         return if (COLOR == ACTIVE_COLOR) "$IP:$PORT${System.lineSeparator()}$USERNAME:$PASSWORD" else "$IP"
     }
 
-    override fun updateDescription(newValue: String) {
-        super.updateDescription(newValue)
+    private fun updateDescription(newValue: String) {
+        description.value = newValue
         DESCRIPTION = newValue
     }
 
-    override fun updateColor(newValue: Long) {
-        super.updateColor(newValue)
+    private fun updateColor(newValue: Long) {
+        color.longValue = newValue
         COLOR = newValue
     }
 
-    override fun onClick() {
+    fun onClick() {
         val activity = activityRef.get() ?: return
         if (!hasPermission()) {
             requestPermission(activity)
