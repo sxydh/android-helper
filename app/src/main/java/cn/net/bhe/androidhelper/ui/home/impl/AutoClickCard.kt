@@ -99,8 +99,7 @@ class AutoClickCardData : CardData() {
         Log.d(TAG, "onClick")
 
         if (color.longValue == INACTIVE_COLOR) {
-            if (!Settings.canDrawOverlays(activity)) {
-                requestPermission(activity)
+            if (!checkPermission(activity)) {
                 return
             }
             updateColor(ACTIVE_COLOR)
@@ -109,11 +108,20 @@ class AutoClickCardData : CardData() {
         }
     }
 
-    private fun requestPermission(activity: MainActivity) {
-        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-            data = Uri.parse("package:${activity.packageName}")
+    private fun checkPermission(activity: MainActivity): Boolean {
+        if (!Settings.canDrawOverlays(activity)) {
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.parse("package:${activity.packageName}")
+            }
+            activity.startActivity(intent)
+            return false
         }
-        activity.startActivity(intent)
+        if (!MyAccessibilityService.isAccessibilityServiceEnabled(activity, MyAccessibilityService::class.java)) {
+            val intent = Intent(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+            activity.startActivity(intent)
+            return false
+        }
+        return true
     }
 
     fun isOpenOverlayView(): Boolean {
@@ -177,6 +185,14 @@ class MyAccessibilityService : AccessibilityService() {
 
     companion object {
         val TAG: String = MyAccessibilityService::class.java.simpleName
+
+        fun isAccessibilityServiceEnabled(context: Context, service: Class<out AccessibilityService>): Boolean {
+            val str = Settings.Secure.getString(context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
+            if (StrUtils.isEmpty(str)) {
+                return false
+            }
+            return str.contains(service.simpleName)
+        }
     }
 
     private val broadcastReceiver = object : BroadcastReceiver() {
