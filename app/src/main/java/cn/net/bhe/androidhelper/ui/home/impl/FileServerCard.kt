@@ -8,9 +8,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import cn.net.bhe.androidhelper.MainActivity
 import cn.net.bhe.androidhelper.ui.home.BaseCard
-import cn.net.bhe.androidhelper.ui.home.CardData
+import cn.net.bhe.androidhelper.ui.home.CardViewModel
 import cn.net.bhe.androidhelper.utils.FileServerUtils
 import cn.net.bhe.androidhelper.utils.IPUtils
 import cn.net.bhe.mutil.StrUtils
@@ -18,84 +19,73 @@ import cn.net.bhe.mutil.StrUtils
 @Composable
 fun FileServerCard() {
     val context = LocalContext.current as MainActivity
-    val cardData = FileServerCardData()
-    cardData.init(context)
-    BaseCard(cardData) {
-        cardData.onClick(context)
+    val cardViewModel: FileServerCardViewModel = viewModel()
+    cardViewModel.init(context)
+    BaseCard(cardViewModel) {
+        cardViewModel.onClick(context)
     }
 }
 
-class FileServerCardData : CardData() {
+class FileServerCardViewModel : CardViewModel() {
 
-    companion object {
-        const val ACTIVE_COLOR = 0xFF1AEA0B
-        const val INACTIVE_COLOR = 0xFFFF9C1D
+    private val activeColor = 0xFF1AEA0B
+    private val inactiveColor = 0xFFFF9C1D
+    private var ip: String = StrUtils.EMPTY
+    private val port = 34567
+    private var username: String = StrUtils.EMPTY
+    private var password: String = StrUtils.EMPTY
+    private var fileServer: FileServerUtils.FileServer? = null
 
-        var IP: String? = null
-        const val PORT = 34567
-        var USERNAME: String? = null
-        var PASSWORD: String? = null
-        var FILE_SERVER: FileServerUtils.FileServer? = null
-
-        const val TITLE = "文件服务器"
-        var DESCRIPTION = StrUtils.EMPTY
-        var COLOR = INACTIVE_COLOR
-    }
-
-    override val title = TITLE
-    override var description = mutableStateOf(DESCRIPTION)
-    override val color = mutableLongStateOf(COLOR)
+    override val title = "文件服务器"
+    override var description = mutableStateOf(StrUtils.EMPTY)
+    override val color = mutableLongStateOf(inactiveColor)
 
     fun init(activity: MainActivity) {
-        IP = IPUtils.getLanIP(activity)
-        updateDescription(getDescription())
+        ip = IPUtils.getLanIP(activity) ?: StrUtils.EMPTY
+        description.value = getDescription()
     }
 
     private fun getDescription(): String {
-        return if (COLOR == ACTIVE_COLOR) "$IP:$PORT${System.lineSeparator()}$USERNAME:$PASSWORD" else "$IP"
-    }
-
-    private fun updateDescription(newValue: String) {
-        description.value = newValue
-        DESCRIPTION = newValue
-    }
-
-    private fun updateColor(newValue: Long) {
-        color.longValue = newValue
-        COLOR = newValue
+        return if (color.longValue == activeColor) "$ip:$port${System.lineSeparator()}$username:$password" else ip
     }
 
     fun onClick(activity: MainActivity) {
-        if (!hasPermission()) {
-            requestPermission(activity)
+        if (!checkPermission(activity)) {
             return
         }
 
-        if (COLOR == INACTIVE_COLOR) {
-            USERNAME = StrUtils.randomEn(3)
-            PASSWORD = StrUtils.randomNum(6)
-            FILE_SERVER = FileServerUtils.build("0.0.0.0", PORT, "/storage/emulated/0/Download/ROOT", USERNAME!!, PASSWORD!!)
-            FILE_SERVER?.start()?.let {
-                updateColor(ACTIVE_COLOR)
-                updateDescription(getDescription())
+        if (color.longValue == inactiveColor) {
+            username = StrUtils.randomEn(3)
+            password = StrUtils.randomNum(6)
+            fileServer = FileServerUtils.build(
+                "0.0.0.0",
+                port,
+                "/storage/emulated/0/Download/ROOT",
+                username,
+                password
+            ).apply {
+                start()
+                color.longValue = activeColor
+                description.value = getDescription()
             }
         } else {
-            FILE_SERVER?.stop()?.let {
-                updateColor(INACTIVE_COLOR)
-                updateDescription(getDescription())
+            fileServer?.apply {
+                stop()
+                color.longValue = inactiveColor
+                description.value = getDescription()
             }
         }
     }
 
-    private fun hasPermission(): Boolean {
-        return Environment.isExternalStorageManager()
-    }
-
-    private fun requestPermission(activity: MainActivity) {
-        val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
-            data = Uri.parse("package:${activity.packageName}")
+    private fun checkPermission(activity: MainActivity): Boolean {
+        if (!Environment.isExternalStorageManager()) {
+            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
+                data = Uri.parse("package:${activity.packageName}")
+            }
+            activity.startActivity(intent)
+            return false
         }
-        activity.startActivity(intent)
+        return true
     }
 
 }
