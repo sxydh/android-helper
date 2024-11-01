@@ -61,7 +61,7 @@ fun PreOverlayView() {
     val preViewModel: PreViewModel = viewModel()
 
     preViewModel.removeView(context)
-    if (preViewModel.isOpen()) {
+    if (preViewModel.shouldOpen) {
         val color by preViewModel.color
 
         val composeView = ComposeView(context).apply {
@@ -74,7 +74,7 @@ fun PreOverlayView() {
                         .clip(CircleShape)
                         .background(Color(color))
                         .clickable {
-                            preViewModel.onClick()
+                            preViewModel.onClick(context)
                         }
                 ) {}
             }
@@ -89,7 +89,7 @@ fun MaskOverlayView() {
     val maskViewModel: MaskViewModel = viewModel()
 
     maskViewModel.removeView(context)
-    if (maskViewModel.isOpen()) {
+    if (maskViewModel.shouldOpen) {
         val composeView = ComposeView(context).apply {
             setViewTreeLifecycleOwner(LocalLifecycleOwner.current)
             setViewTreeSavedStateRegistryOwner(LocalSavedStateRegistryOwner.current)
@@ -115,7 +115,7 @@ fun PointerOverlayView() {
     val pointerViewModel: PointerViewModel = viewModel()
 
     pointerViewModel.removeView(context)
-    if (pointerViewModel.isOpen()) {
+    if (pointerViewModel.shouldOpen) {
         val composeView = ComposeView(context).apply {
             setViewTreeLifecycleOwner(LocalLifecycleOwner.current)
             setViewTreeSavedStateRegistryOwner(LocalSavedStateRegistryOwner.current)
@@ -180,6 +180,11 @@ class PreViewModel : ViewModel() {
     private val inactiveColor = 0xFFFF9C1D
     private var view = WeakReference<ComposeView>(null)
     private var isOpen = false
+    var shouldOpen: Boolean
+        get() = isOpen
+        set(value) {
+            isOpen = value
+        }
 
     val color = mutableLongStateOf(inactiveColor)
 
@@ -188,10 +193,10 @@ class PreViewModel : ViewModel() {
 
         val maskViewModel = ViewModelProvider(activity)[MaskViewModel::class.java]
         if (color.longValue == inactiveColor) {
-            maskViewModel.setIsOpen(true)
+            maskViewModel.shouldOpen = true
             color.longValue = activeColor
         } else {
-            maskViewModel.setIsOpen(false)
+            maskViewModel.shouldOpen = false
             color.longValue = inactiveColor
         }
     }
@@ -219,6 +224,11 @@ class MaskViewModel : ViewModel() {
 
     private var view = WeakReference<ComposeView>(null)
     private var isOpen = false
+    var shouldOpen: Boolean
+        get() = isOpen
+        set(value) {
+            isOpen = value
+        }
 
     fun addView(activity: MainActivity, composeView: ComposeView) {
         addViewDo(activity, composeView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
@@ -243,6 +253,11 @@ class PointerViewModel : ViewModel() {
 
     private var view = WeakReference<ComposeView>(null)
     private var isOpen = false
+    var shouldOpen: Boolean
+        get() = isOpen
+        set(value) {
+            isOpen = value
+        }
 
     fun addView(activity: MainActivity, composeView: ComposeView) {
         addViewDo(activity, composeView)
