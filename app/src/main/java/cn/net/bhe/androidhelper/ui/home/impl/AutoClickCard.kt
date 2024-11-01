@@ -26,18 +26,20 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import cn.net.bhe.androidhelper.MainActivity
-import cn.net.bhe.androidhelper.ui.home.CardBase
-import cn.net.bhe.androidhelper.ui.home.CardViewModel
+import cn.net.bhe.androidhelper.ui.home.BaseCard
+import cn.net.bhe.androidhelper.ui.home.CardData
 import cn.net.bhe.mutil.StrUtils
 import java.lang.ref.WeakReference
 
 @Composable
-fun AutoClickCardView() {
-    val viewModel = AutoClickCardViewModel(LocalContext.current as MainActivity)
-    CardBase(viewModel)
+fun AutoClickCard() {
+    val context = LocalContext.current as MainActivity
+    val cardData = AutoClickCardData()
+    BaseCard(cardData) {
+        cardData.onClick(context)
+    }
 
-    if (viewModel.isOpen.value) {
-        val context = LocalContext.current
+    if (cardData.color.longValue == AutoClickCardData.ACTIVE_COLOR) {
         val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val composeView = ComposeView(context).apply {
             setViewTreeLifecycleOwner(LocalLifecycleOwner.current)
@@ -60,41 +62,50 @@ fun AutoClickCardView() {
             android.graphics.PixelFormat.TRANSLUCENT
         )
 
-        params.x = 100
-        params.y = 100
-
         windowManager.addView(composeView, params)
+        AutoClickCardData.OVERLAY_VIEW = WeakReference(composeView)
+    } else {
+        AutoClickCardData.OVERLAY_VIEW.get()?.let {
+            val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            windowManager.removeView(it)
+        }
     }
 }
 
-class AutoClickCardViewModel(activity: MainActivity) : CardViewModel() {
+class AutoClickCardData : CardData() {
 
     companion object {
-        val TAG: String = AutoClickCardViewModel::class.java.simpleName
-        val BC_ID: String = "${AutoClickCardViewModel::class.java.name}.onClick"
+        val TAG: String = AutoClickCardData::class.java.simpleName
+        const val ACTIVE_COLOR = 0xFF1AEA0B
+        const val INACTIVE_COLOR = 0xFFFF9C1D
+        val BC_ID: String = "${AutoClickCardData::class.java.name}.onClick"
 
         const val TITLE = "连击器"
-        const val DESCRIPTION = StrUtils.EMPTY
-        const val COLOR = 0xFFC6F300
+        var DESCRIPTION = StrUtils.EMPTY
+        var COLOR = INACTIVE_COLOR
+        var OVERLAY_VIEW = WeakReference<ComposeView>(null)
     }
 
-    override val title = mutableStateOf(TITLE)
+    override val title = TITLE
     override val description = mutableStateOf(DESCRIPTION)
     override val color = mutableLongStateOf(COLOR)
-    val isOpen = mutableStateOf(false)
 
-    private val activityRef: WeakReference<MainActivity> = WeakReference(activity)
+    private fun updateColor(newValue: Long) {
+        color.longValue = newValue
+        COLOR = newValue
+    }
 
-    override fun onClick() {
+    fun onClick(activity: MainActivity) {
         Log.d(TAG, "onClick")
 
-        activityRef.get()?.let {
-            if (!Settings.canDrawOverlays(it)) {
-                requestPermission(it)
+        if (color.longValue == INACTIVE_COLOR) {
+            if (!Settings.canDrawOverlays(activity)) {
+                requestPermission(activity)
                 return
             }
-            val intent = Intent(BC_ID)
-            it.sendBroadcast(intent)
+            updateColor(ACTIVE_COLOR)
+        } else {
+            updateColor(INACTIVE_COLOR)
         }
     }
 
@@ -125,7 +136,7 @@ class MyAccessibilityService : AccessibilityService() {
         super.onCreate()
         Log.d(TAG, "onCreate")
 
-        val filter = IntentFilter(AutoClickCardViewModel.BC_ID)
+        val filter = IntentFilter(AutoClickCardData.BC_ID)
         registerReceiver(broadcastReceiver, filter)
     }
 
@@ -141,7 +152,7 @@ class MyAccessibilityService : AccessibilityService() {
     }
 
     private fun onReceiveDo(context: Context) {
-        Log.d(TAG, context.packageName)
+        Log.d(TAG, "onReceiveDo")
     }
 
 }
