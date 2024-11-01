@@ -14,17 +14,18 @@ import cn.net.bhe.androidhelper.ui.home.CardData
 import cn.net.bhe.androidhelper.utils.FileServerUtils
 import cn.net.bhe.androidhelper.utils.IPUtils
 import cn.net.bhe.mutil.StrUtils
-import java.lang.ref.WeakReference
 
 @Composable
 fun FileServerCard() {
-    val cardData = FileServerCardData(LocalContext.current as MainActivity)
+    val context = LocalContext.current as MainActivity
+    val cardData = FileServerCardData()
+    cardData.init(context)
     BaseCard(cardData) {
-        cardData.onClick()
+        cardData.onClick(context)
     }
 }
 
-class FileServerCardData(activity: MainActivity) : CardData() {
+class FileServerCardData : CardData() {
 
     companion object {
         const val ACTIVE_COLOR = 0xFF1AEA0B
@@ -45,12 +46,8 @@ class FileServerCardData(activity: MainActivity) : CardData() {
     override var description = mutableStateOf(DESCRIPTION)
     override val color = mutableLongStateOf(COLOR)
 
-    private val activityRef: WeakReference<MainActivity> = WeakReference(activity)
-
-    init {
-        activityRef.get()?.let {
-            IP = IPUtils.getLanIP(it)
-        }
+    fun init(activity: MainActivity) {
+        IP = IPUtils.getLanIP(activity)
         updateDescription(getDescription())
     }
 
@@ -68,8 +65,7 @@ class FileServerCardData(activity: MainActivity) : CardData() {
         COLOR = newValue
     }
 
-    fun onClick() {
-        val activity = activityRef.get() ?: return
+    fun onClick(activity: MainActivity) {
         if (!hasPermission()) {
             requestPermission(activity)
             return
