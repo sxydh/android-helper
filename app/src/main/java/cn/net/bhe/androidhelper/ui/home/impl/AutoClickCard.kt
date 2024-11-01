@@ -13,7 +13,9 @@ import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
@@ -22,38 +24,45 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.setViewTreeLifecycleOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import cn.net.bhe.androidhelper.MainActivity
 import cn.net.bhe.androidhelper.ui.home.BaseCard
-import cn.net.bhe.androidhelper.ui.home.CardData
+import cn.net.bhe.androidhelper.ui.home.CardViewModel
 import cn.net.bhe.mutil.StrUtils
 import java.lang.ref.WeakReference
 
 @Composable
 fun AutoClickCard() {
     val context = LocalContext.current as MainActivity
-    val cardData = AutoClickCardData()
-    BaseCard(cardData) {
-        cardData.onClick(context)
+    val cardViewModel: AutoClickCardViewModel = viewModel()
+    BaseCard(cardViewModel) {
+        cardViewModel.onClick(context)
     }
-    PreOverlayView(cardData)
+    PreOverlayView()
+    MaskOverlayView()
+    PointerOverlayView()
 }
 
 @Composable
-fun PreOverlayView(cardData: AutoClickCardData) {
+fun PreOverlayView() {
     val context = LocalContext.current as MainActivity
-    val preOverlayViewData = PreOverlayViewData()
+    val preViewModel: PreViewModel = viewModel()
 
-    preOverlayViewData.removeView(context)
-    if (cardData.isOpenPreOverlayView()) {
-        val color by preOverlayViewData.color
+    preViewModel.removeView(context)
+    if (preViewModel.isOpen()) {
+        val color by preViewModel.color
 
         val composeView = ComposeView(context).apply {
             setViewTreeLifecycleOwner(LocalLifecycleOwner.current)
@@ -65,47 +74,81 @@ fun PreOverlayView(cardData: AutoClickCardData) {
                         .clip(CircleShape)
                         .background(Color(color))
                         .clickable {
-                            preOverlayViewData.onClick(context)
+                            preViewModel.onClick()
                         }
                 ) {}
             }
         }
-        preOverlayViewData.addView(context, composeView)
+        preViewModel.addView(context, composeView)
     }
 }
 
-class AutoClickCardData : CardData() {
+@Composable
+fun MaskOverlayView() {
+    val context = LocalContext.current as MainActivity
+    val maskViewModel: MaskViewModel = viewModel()
+
+    maskViewModel.removeView(context)
+    if (maskViewModel.isOpen()) {
+        val composeView = ComposeView(context).apply {
+            setViewTreeLifecycleOwner(LocalLifecycleOwner.current)
+            setViewTreeSavedStateRegistryOwner(LocalSavedStateRegistryOwner.current)
+            setContent {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .pointerInput(Unit) {
+                            detectTapGestures { offset: Offset ->
+                                println("${offset.x}, ${offset.y}")
+                            }
+                        }
+                ) {}
+            }
+        }
+        maskViewModel.addView(context, composeView)
+    }
+}
+
+@Composable
+fun PointerOverlayView() {
+    val context = LocalContext.current as MainActivity
+    val pointerViewModel: PointerViewModel = viewModel()
+
+    pointerViewModel.removeView(context)
+    if (pointerViewModel.isOpen()) {
+        val composeView = ComposeView(context).apply {
+            setViewTreeLifecycleOwner(LocalLifecycleOwner.current)
+            setViewTreeSavedStateRegistryOwner(LocalSavedStateRegistryOwner.current)
+            setContent { }
+        }
+        pointerViewModel.addView(context, composeView)
+    }
+}
+
+class AutoClickCardViewModel : CardViewModel() {
 
     companion object {
-        val TAG: String = AutoClickCardData::class.java.simpleName
-        const val ACTIVE_COLOR = 0xFF1AEA0B
-        const val INACTIVE_COLOR = 0xFF1DFFEC
-        val BC_ID: String = "${AutoClickCardData::class.java.name}.onClick"
-
-        const val TITLE = "连击器"
-        var DESCRIPTION = StrUtils.EMPTY
-        var COLOR = INACTIVE_COLOR
+        private val TAG: String = AutoClickCardViewModel::class.java.simpleName
+        val BC_ID: String = "${AutoClickCardViewModel::class.java.name}.onClick"
     }
 
-    override val title = TITLE
-    override val description = mutableStateOf(DESCRIPTION)
-    override val color = mutableLongStateOf(COLOR)
+    private val activeColor = 0xFF1AEA0B
+    private val inactiveColor = 0xFFFF9C1D
 
-    private fun updateColor(newValue: Long) {
-        color.longValue = newValue
-        COLOR = newValue
-    }
+    override val title = "连击器"
+    override var description = mutableStateOf(StrUtils.EMPTY)
+    override val color = mutableLongStateOf(inactiveColor)
 
     fun onClick(activity: MainActivity) {
         Log.d(TAG, "onClick")
 
-        if (color.longValue == INACTIVE_COLOR) {
+        if (color.longValue == inactiveColor) {
             if (!checkPermission(activity)) {
                 return
             }
-            updateColor(ACTIVE_COLOR)
+            color.longValue = activeColor
         } else {
-            updateColor(INACTIVE_COLOR)
+            color.longValue = inactiveColor
         }
     }
 
@@ -125,50 +168,92 @@ class AutoClickCardData : CardData() {
         return true
     }
 
-    fun isOpenPreOverlayView(): Boolean {
-        return color.longValue == ACTIVE_COLOR
-    }
-
 }
 
-class PreOverlayViewData {
+class PreViewModel : ViewModel() {
 
     companion object {
-        val TAG: String = AutoClickCardData::class.java.simpleName
-        const val ACTIVE_COLOR = 0xFF1AEA0B
-        const val INACTIVE_COLOR = 0xFF1DFFEC
-
-        var VIEW = WeakReference<ComposeView>(null)
-        var COLOR = INACTIVE_COLOR
+        private val TAG: String = AutoClickCardViewModel::class.java.simpleName
     }
 
-    var color = mutableLongStateOf(COLOR)
+    private val activeColor = 0xFF1AEA0B
+    private val inactiveColor = 0xFFFF9C1D
+    private var view = WeakReference<ComposeView>(null)
+    private var isOpen = false
 
-    fun addView(activity: MainActivity, composeView: ComposeView) {
-        addViewDo(activity, composeView)
-        VIEW = WeakReference(composeView)
-    }
-
-    private fun updateColor(newValue: Long) {
-        color.longValue = newValue
-        COLOR = newValue
-    }
+    val color = mutableLongStateOf(inactiveColor)
 
     fun onClick(activity: MainActivity) {
         Log.d(TAG, "onClick")
 
-        if (color.longValue == INACTIVE_COLOR) {
-            updateColor(ACTIVE_COLOR)
+        val maskViewModel = ViewModelProvider(activity)[MaskViewModel::class.java]
+        if (color.longValue == inactiveColor) {
+            maskViewModel.setIsOpen(true)
+            color.longValue = activeColor
         } else {
-            updateColor(INACTIVE_COLOR)
+            maskViewModel.setIsOpen(false)
+            color.longValue = inactiveColor
         }
     }
 
+    fun addView(activity: MainActivity, composeView: ComposeView) {
+        addViewDo(activity, composeView)
+        view = WeakReference(composeView)
+    }
+
     fun removeView(activity: MainActivity) {
-        VIEW.get()?.let {
+        view.get()?.let {
             val windowManager = activity.getSystemService(Context.WINDOW_SERVICE) as WindowManager
             windowManager.removeView(it)
-            VIEW = WeakReference(null)
+            view = WeakReference(null)
+        }
+    }
+
+}
+
+class MaskViewModel : ViewModel() {
+
+    companion object {
+        private val TAG: String = MaskViewModel::class.java.simpleName
+    }
+
+    private var view = WeakReference<ComposeView>(null)
+    private var isOpen = false
+
+    fun addView(activity: MainActivity, composeView: ComposeView) {
+        addViewDo(activity, composeView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
+        view = WeakReference(composeView)
+    }
+
+    fun removeView(activity: MainActivity) {
+        view.get()?.let {
+            val windowManager = activity.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            windowManager.removeView(it)
+            view = WeakReference(null)
+        }
+    }
+
+}
+
+class PointerViewModel : ViewModel() {
+
+    companion object {
+        private val TAG: String = PointerViewModel::class.java.simpleName
+    }
+
+    private var view = WeakReference<ComposeView>(null)
+    private var isOpen = false
+
+    fun addView(activity: MainActivity, composeView: ComposeView) {
+        addViewDo(activity, composeView)
+        view = WeakReference(composeView)
+    }
+
+    fun removeView(activity: MainActivity) {
+        view.get()?.let {
+            val windowManager = activity.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            windowManager.removeView(it)
+            view = WeakReference(null)
         }
     }
 
@@ -177,7 +262,7 @@ class PreOverlayViewData {
 class MyAccessibilityService : AccessibilityService() {
 
     companion object {
-        val TAG: String = MyAccessibilityService::class.java.simpleName
+        private val TAG: String = MyAccessibilityService::class.java.simpleName
 
         fun isAccessibilityServiceEnabled(context: Context, service: Class<out AccessibilityService>): Boolean {
             val str = Settings.Secure.getString(context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
@@ -200,7 +285,7 @@ class MyAccessibilityService : AccessibilityService() {
         super.onCreate()
         Log.d(TAG, "onCreate")
 
-        val filter = IntentFilter(AutoClickCardData.BC_ID)
+        val filter = IntentFilter(AutoClickCardViewModel.BC_ID)
         registerReceiver(broadcastReceiver, filter)
     }
 
