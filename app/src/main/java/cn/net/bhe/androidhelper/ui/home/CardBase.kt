@@ -71,7 +71,7 @@ fun CardBase(cardData: CardData, onClick: () -> Unit) {
 abstract class CardData {
 
     abstract val title: String
-    abstract var description: MutableState<String>
-    abstract var color: MutableState<Long>
+    abstract val description: MutableState<String>
+    abstract val color: MutableState<Long>
 
 }
