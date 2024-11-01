@@ -37,7 +37,7 @@ class FileServerCardData : CardData() {
         var PASSWORD: String? = null
         var FILE_SERVER: FileServerUtils.FileServer? = null
 
-        var TITLE: String = "文件服务器"
+        const val TITLE: String = "文件服务器"
         var DESCRIPTION: String = StrUtils.EMPTY
         var COLOR: Long = INACTIVE_COLOR
     }
