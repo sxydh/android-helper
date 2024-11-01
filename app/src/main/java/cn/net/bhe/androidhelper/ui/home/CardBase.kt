@@ -70,4 +70,4 @@ fun CardBase(cardData: CardData, onClick: () -> Unit) {
     }
 }
 
-data class CardData(val title: String, val description: String, val color: Long)
+data class CardData(val title: String, var description: String, var color: Long)
