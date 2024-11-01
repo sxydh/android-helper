@@ -13,11 +13,8 @@ import android.view.accessibility.AccessibilityEvent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -61,24 +58,15 @@ fun OverlayView(cardData: AutoClickCardData) {
             setViewTreeLifecycleOwner(LocalLifecycleOwner.current)
             setViewTreeSavedStateRegistryOwner(LocalSavedStateRegistryOwner.current)
             setContent {
-                Card(
+                Column(
                     modifier = Modifier
                         .size(50.dp)
                         .clip(CircleShape)
+                        .background(Color(color))
                         .clickable {
                             overlayViewData.onClick(context)
-                        },
-                    elevation = CardDefaults.cardElevation(
-                        defaultElevation = 6.dp,
-                        pressedElevation = 12.dp
-                    )
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color(color)),
-                    ) {}
-                }
+                        }
+                ) {}
             }
         }
         overlayViewData.addView(context, composeView)
