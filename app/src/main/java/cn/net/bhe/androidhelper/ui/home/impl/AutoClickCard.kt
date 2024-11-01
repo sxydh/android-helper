@@ -13,7 +13,7 @@ import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
@@ -59,7 +59,7 @@ fun OverlayView(cardData: AutoClickCardData) {
             setViewTreeLifecycleOwner(LocalLifecycleOwner.current)
             setViewTreeSavedStateRegistryOwner(LocalSavedStateRegistryOwner.current)
             setContent {
-                Column(
+                Box(
                     modifier = Modifier
                         .size(50.dp)
                         .clip(CircleShape)
@@ -144,11 +144,19 @@ class OverlayViewData {
 
     var color = mutableLongStateOf(COLOR)
 
-    fun addView(activity: MainActivity, composeView: ComposeView, gv: Int = Gravity.CENTER or Gravity.CENTER, xv: Int = 0, yv: Int = 0) {
+    fun addView(
+        activity: MainActivity,
+        composeView: ComposeView,
+        wv: Int = WindowManager.LayoutParams.WRAP_CONTENT,
+        hv: Int = WindowManager.LayoutParams.WRAP_CONTENT,
+        gv: Int = Gravity.CENTER or Gravity.CENTER,
+        xv: Int = 0,
+        yv: Int = 0
+    ) {
         val windowManager = activity.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val params = WindowManager.LayoutParams(
-            WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.WRAP_CONTENT,
+            wv,
+            hv,
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             android.graphics.PixelFormat.TRANSLUCENT
