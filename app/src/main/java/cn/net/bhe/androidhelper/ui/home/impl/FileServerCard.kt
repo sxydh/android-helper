@@ -37,9 +37,9 @@ class FileServerCardData : CardData() {
         var PASSWORD: String? = null
         var FILE_SERVER: FileServerUtils.FileServer? = null
 
-        const val TITLE: String = "文件服务器"
-        var DESCRIPTION: String = StrUtils.EMPTY
-        var COLOR: Long = INACTIVE_COLOR
+        const val TITLE = "文件服务器"
+        var DESCRIPTION = StrUtils.EMPTY
+        var COLOR = INACTIVE_COLOR
     }
 
     override val title = TITLE
