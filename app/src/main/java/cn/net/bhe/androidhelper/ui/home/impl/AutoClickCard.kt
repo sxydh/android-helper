@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import cn.net.bhe.androidhelper.MainActivity
-import cn.net.bhe.androidhelper.ui.home.CardView
+import cn.net.bhe.androidhelper.ui.home.CardBase
 import cn.net.bhe.androidhelper.ui.home.CardViewModel
 import cn.net.bhe.mutil.StrUtils
 import java.lang.ref.WeakReference
@@ -34,7 +34,7 @@ import java.lang.ref.WeakReference
 @Composable
 fun AutoClickCardView() {
     val viewModel = AutoClickCardViewModel(LocalContext.current as MainActivity)
-    CardView(viewModel)
+    CardBase(viewModel)
 
     if (viewModel.isOpen.value) {
         val context = LocalContext.current

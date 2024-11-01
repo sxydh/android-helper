@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import cn.net.bhe.mutil.StrUtils
 
 @Composable
-fun CardView(cardViewModel: CardViewModel) {
+fun CardBase(cardViewModel: CardViewModel) {
 
     val title by cardViewModel.title
     val description by cardViewModel.description
