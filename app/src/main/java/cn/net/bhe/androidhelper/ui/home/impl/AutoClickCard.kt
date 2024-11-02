@@ -382,6 +382,7 @@ class MyAccessibilityService : AccessibilityService() {
         if (actionExtra == action) {
             return
         }
+        action = actionExtra
         executor.submit {
             while (action == MSG_ACTION_AUTO_CLICK) {
                 val path = Path().apply {
