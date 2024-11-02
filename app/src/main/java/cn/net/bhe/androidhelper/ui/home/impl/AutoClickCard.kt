@@ -251,10 +251,6 @@ class MaskViewModel : ViewModel() {
 
 class PointerViewModel : ViewModel() {
 
-    companion object {
-        private val TAG: String = PointerViewModel::class.java.simpleName
-    }
-
     private var view = WeakReference<ComposeView>(null)
 
     fun addView(activity: MainActivity, composeView: ComposeView) {
