@@ -377,6 +377,7 @@ class MyAccessibilityService : AccessibilityService() {
         }
         if (actionExtra == MSG_ACTION_STOP_CLICK) {
             handleStopClickJob()
+            return
         }
     }
 
