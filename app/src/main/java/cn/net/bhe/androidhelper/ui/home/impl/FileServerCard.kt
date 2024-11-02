@@ -36,7 +36,7 @@ class FileServerCardViewModel : CardViewModel() {
     private var password: String = StrUtils.EMPTY
     private var fileServer: FileServerUtils.FileServer? = null
 
-    override val title = "文件服务器"
+    override val title = mutableStateOf("文件服务器")
     override var description = mutableStateOf(StrUtils.EMPTY)
     override val color = mutableLongStateOf(inactiveColor)
 
