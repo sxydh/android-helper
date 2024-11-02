@@ -20,7 +20,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -90,6 +92,7 @@ fun CtrlOverlayView(ctrlViewModel: CtrlViewModel) {
     Log.d("@Composable", "CtrlOverlayView")
 
     val context = LocalContext.current as MainActivity
+    val description by ctrlViewModel.description
     val color by ctrlViewModel.color
 
     val composeView = ComposeView(context).apply {
@@ -102,11 +105,29 @@ fun CtrlOverlayView(ctrlViewModel: CtrlViewModel) {
                     .clip(CircleShape)
                     .background(Color(color))
                     .clickable { ctrlViewModel.onClick(context) }
-            ) {}
+            ) {
+                Text(text = description)
+            }
         }
     }
     ctrlViewModel.removeView(context)
     ctrlViewModel.addView(context, composeView)
+
+    // TODO
+    DisposableEffect(Unit) {
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+
+            }
+        }
+
+        val filter = IntentFilter(MyAccessibilityService.BC_CLICK)
+        context.registerReceiver(receiver, filter)
+
+        onDispose {
+            context.unregisterReceiver(receiver)
+        }
+    }
 }
 
 @Composable
@@ -207,6 +228,7 @@ class CtrlViewModel : ViewModel() {
     private var view = WeakReference<ComposeView>(null)
 
     val color = mutableLongStateOf(inactiveColor)
+    val description = mutableStateOf(StrUtils.EMPTY)
     val isOpenMask = mutableStateOf(false)
 
     fun onClick(activity: MainActivity) {
@@ -219,7 +241,7 @@ class CtrlViewModel : ViewModel() {
             color.longValue = inactiveColor
             isOpenMask.value = false
 
-            val intent = Intent(MyAccessibilityService.BC_ACTION)
+            val intent = Intent(MyAccessibilityService.BC_CLICK)
             intent.putExtra("action", MyAccessibilityService.MSG_ACTION_STOP_CLICK)
             activity.sendBroadcast(intent)
         }
@@ -258,7 +280,7 @@ class MaskViewModel : ViewModel() {
         Log.d(TAG, "onClick")
 
         removeView(activity)
-        val intent = Intent(MyAccessibilityService.BC_ACTION)
+        val intent = Intent(MyAccessibilityService.BC_CLICK)
         intent.putExtra("action", MyAccessibilityService.MSG_ACTION_AUTO_CLICK)
         intent.putExtra("x", offset.x)
         intent.putExtra("y", offset.y)
@@ -315,7 +337,7 @@ class MyAccessibilityService : AccessibilityService() {
 
     companion object {
         private val TAG: String = MyAccessibilityService::class.java.simpleName
-        val BC_ACTION: String = "${MyAccessibilityService::class.java.name}.Broadcast"
+        val BC_CLICK: String = "${MyAccessibilityService::class.java.name}.Broadcast"
         const val MSG_ACTION_AUTO_CLICK = "MSG_ACTION_AUTO_CLICK"
         const val MSG_ACTION_STOP_CLICK = "MSG_ACTION_STOP_CLICK"
         private val executor = ThreadPoolExecutor(
@@ -352,7 +374,7 @@ class MyAccessibilityService : AccessibilityService() {
         super.onCreate()
         Log.d(TAG, "onCreate")
 
-        val filter = IntentFilter(BC_ACTION)
+        val filter = IntentFilter(BC_CLICK)
         registerReceiver(broadcastReceiver, filter)
     }
 
