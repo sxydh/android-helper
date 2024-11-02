@@ -44,7 +44,9 @@ import cn.net.bhe.androidhelper.ui.home.CardViewModel
 import cn.net.bhe.mutil.StrUtils
 import java.lang.ref.WeakReference
 import java.util.concurrent.ArrayBlockingQueue
+import java.util.concurrent.Executors
 import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.ThreadPoolExecutor.DiscardPolicy
 import java.util.concurrent.TimeUnit
 
 @Composable
@@ -308,7 +310,15 @@ class MyAccessibilityService : AccessibilityService() {
 
     companion object {
         private val TAG: String = MyAccessibilityService::class.java.simpleName
-        private val executor = ThreadPoolExecutor(2, 4, 1000, TimeUnit.MILLISECONDS, ArrayBlockingQueue(8))
+        private val executor = ThreadPoolExecutor(
+            2,
+            4,
+            1000,
+            TimeUnit.MILLISECONDS,
+            ArrayBlockingQueue(8),
+            Executors.defaultThreadFactory(),
+            DiscardPolicy()
+        )
 
         fun isAccessibilityServiceEnabled(context: Context): Boolean {
             val str = Settings.Secure.getString(context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
