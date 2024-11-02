@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -87,10 +88,6 @@ fun OverlayView() {
 fun CtrlOverlayView(ctrlViewModel: CtrlViewModel) {
     Log.d("@Composable", "CtrlOverlayView")
 
-    if (!ctrlViewModel.isAddView()) {
-        return
-    }
-
     val context = LocalContext.current as MainActivity
     val description by ctrlViewModel.description
     val color by ctrlViewModel.color
@@ -110,7 +107,13 @@ fun CtrlOverlayView(ctrlViewModel: CtrlViewModel) {
             }
         }
     }
-    ctrlViewModel.addView(context, composeView)
+
+    DisposableEffect(Unit) {
+        ctrlViewModel.addView(context, composeView)
+        onDispose {
+            ctrlViewModel.removeView(context)
+        }
+    }
 }
 
 @Composable
@@ -244,10 +247,6 @@ class CtrlViewModel : ViewModel() {
         }
     }
 
-    fun isAddView(): Boolean {
-        return view.get() == null
-    }
-
     fun addView(activity: MainActivity, composeView: ComposeView) {
         Log.d(TAG, "addView")
 
@@ -256,6 +255,18 @@ class CtrlViewModel : ViewModel() {
 
         val filter = IntentFilter(BC)
         activity.registerReceiver(receiver, filter)
+    }
+
+    fun removeView(activity: MainActivity) {
+        Log.d(TAG, "removeView")
+
+        view.get()?.let {
+            val windowManager = activity.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            windowManager.removeView(it)
+            view = WeakReference(null)
+
+            activity.unregisterReceiver(receiver)
+        }
     }
 
 }
