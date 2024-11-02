@@ -435,7 +435,7 @@ class MyAccessibilityService : AccessibilityService() {
                 intent.putExtra("action", CtrlViewModel.MSG_ACTION_CLICK_COUNT)
                 intent.putExtra("count", ++count)
                 sendBroadcast(intent)
-                Thread.sleep(300)
+                Thread.sleep(200)
             }
         }
     }
