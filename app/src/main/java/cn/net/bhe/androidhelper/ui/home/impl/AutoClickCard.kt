@@ -109,7 +109,7 @@ fun MaskOverlayView(maskViewModel: MaskViewModel) {
                     .fillMaxSize()
                     .pointerInput(Unit) {
                         detectTapGestures { offset: Offset ->
-                            println("${offset.x}, ${offset.y}")
+                            maskViewModel.onClick(offset)
                         }
                     }
             ) {}
@@ -228,8 +228,10 @@ class MaskViewModel : ViewModel() {
 
     val isOpenPointer = mutableStateOf(false)
 
-    fun onClick() {
+    fun onClick(offset: Offset) {
         Log.d(TAG, "onClick")
+
+        println("${offset.x}, ${offset.y}")
     }
 
     fun addView(activity: MainActivity, composeView: ComposeView) {
