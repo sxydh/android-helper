@@ -369,33 +369,41 @@ class MyAccessibilityService : AccessibilityService() {
 
     private fun onReceiveDo(intent: Intent) {
         val actionExtra = intent.getStringExtra("action") ?: MSG_ACTION_STOP_CLICK
-        val x = intent.getFloatExtra("x", 0.0f)
-        val y = intent.getFloatExtra("y", 0.0f)
-        handleClickJob(actionExtra, x, y)
-    }
-
-    private fun handleClickJob(actionExtra: String, x: Float, y: Float) {
-        if (actionExtra == action) {
+        if (actionExtra == MSG_ACTION_AUTO_CLICK) {
+            val x = intent.getFloatExtra("x", 0.0f)
+            val y = intent.getFloatExtra("y", 0.0f)
+            handleAutoClickJob(x, y)
             return
         }
-        action = actionExtra
-        if (action == MSG_ACTION_AUTO_CLICK) {
-            executor.submit {
-                Log.d(TAG, "submit")
+        if (actionExtra == MSG_ACTION_STOP_CLICK) {
+            handleStopClickJob()
+        }
+    }
 
-                while (action == MSG_ACTION_AUTO_CLICK) {
-                    val path = Path().apply {
-                        moveTo(x, y)
-                        lineTo(x, y)
-                    }
-                    val gesture = GestureDescription.Builder()
-                        .addStroke(GestureDescription.StrokeDescription(path, 0L, 1))
-                        .build()
-                    dispatchGesture(gesture, null, null)
-                    Thread.sleep(100)
+    private fun handleAutoClickJob(x: Float, y: Float) {
+        if (action == MSG_ACTION_AUTO_CLICK) {
+            return
+        }
+        action = MSG_ACTION_AUTO_CLICK
+        executor.submit {
+            Log.d(TAG, "submit")
+
+            while (action == MSG_ACTION_AUTO_CLICK) {
+                val path = Path().apply {
+                    moveTo(x, y)
+                    lineTo(x, y)
                 }
+                val gesture = GestureDescription.Builder()
+                    .addStroke(GestureDescription.StrokeDescription(path, 0L, 1))
+                    .build()
+                dispatchGesture(gesture, null, null)
+                Thread.sleep(100)
             }
         }
+    }
+
+    private fun handleStopClickJob() {
+        action = MSG_ACTION_STOP_CLICK
     }
 
 }
