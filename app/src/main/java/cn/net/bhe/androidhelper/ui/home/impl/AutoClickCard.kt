@@ -65,17 +65,21 @@ fun AutoClickCard() {
 fun OverlayView() {
     Log.d("@Composable", "OverlayView")
 
+    val context = LocalContext.current as MainActivity
     val cardViewModel: AutoClickCardViewModel = viewModel()
     val ctrlViewModel: CtrlViewModel = viewModel()
     val maskViewModel: MaskViewModel = viewModel()
     val pointerViewModel: PointerViewModel = viewModel()
 
+    pointerViewModel.removeView(context)
     if (maskViewModel.isOpenPointer.value) {
         PointerOverlayView(pointerViewModel)
     }
+    maskViewModel.removeView(context)
     if (ctrlViewModel.isOpenMask.value) {
         MaskOverlayView(maskViewModel)
     }
+    ctrlViewModel.removeView(context)
     if (cardViewModel.isOpenCtrl.value) {
         CtrlOverlayView(ctrlViewModel)
     }
