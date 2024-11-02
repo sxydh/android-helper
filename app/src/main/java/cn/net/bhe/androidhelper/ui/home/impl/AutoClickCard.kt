@@ -369,31 +369,31 @@ class MyAccessibilityService : AccessibilityService() {
 
     private fun onReceiveDo(intent: Intent) {
         val actionExtra = intent.getStringExtra("action") ?: MSG_ACTION_STOP_CLICK
-        if (actionExtra == MSG_ACTION_AUTO_CLICK) {
-            val x = intent.getFloatExtra("x", 0.0f)
-            val y = intent.getFloatExtra("y", 0.0f)
-            handleClickJob(actionExtra, x, y)
-        }
+        val x = intent.getFloatExtra("x", 0.0f)
+        val y = intent.getFloatExtra("y", 0.0f)
+        handleClickJob(actionExtra, x, y)
     }
 
     private fun handleClickJob(actionExtra: String, x: Float, y: Float) {
-        Log.d(TAG, "handleClickJob")
-
         if (actionExtra == action) {
             return
         }
         action = actionExtra
-        executor.submit {
-            while (action == MSG_ACTION_AUTO_CLICK) {
-                val path = Path().apply {
-                    moveTo(x, y)
-                    lineTo(x, y)
+        if (action == MSG_ACTION_AUTO_CLICK) {
+            executor.submit {
+                Log.d(TAG, "submit")
+
+                while (action == MSG_ACTION_AUTO_CLICK) {
+                    val path = Path().apply {
+                        moveTo(x, y)
+                        lineTo(x, y)
+                    }
+                    val gesture = GestureDescription.Builder()
+                        .addStroke(GestureDescription.StrokeDescription(path, 0L, 1))
+                        .build()
+                    dispatchGesture(gesture, null, null)
+                    Thread.sleep(100)
                 }
-                val gesture = GestureDescription.Builder()
-                    .addStroke(GestureDescription.StrokeDescription(path, 0L, 1))
-                    .build()
-                dispatchGesture(gesture, null, null)
-                Thread.sleep(100)
             }
         }
     }
