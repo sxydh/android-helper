@@ -362,6 +362,8 @@ class MyAccessibilityService : AccessibilityService() {
         val x = intent.getFloatExtra("x", 0.0f)
         val y = intent.getFloatExtra("y", 0.0f)
         if (action == AutoClickCardViewModel.MSG_ACTION_AUTO_CLICK) {
+            Log.d(TAG, "handleClickJob")
+
             handleClickJob(x, y)
         }
     }
