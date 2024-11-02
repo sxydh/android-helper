@@ -33,7 +33,6 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
@@ -50,18 +49,16 @@ fun AutoClickCard() {
     BaseCard(cardViewModel) {
         cardViewModel.onClick(context)
     }
-    PreOverlayView()
-    MaskOverlayView()
-    PointerOverlayView()
+    PreOverlayView(cardViewModel)
 }
 
 @Composable
-fun PreOverlayView() {
+fun PreOverlayView(cardViewModel: AutoClickCardViewModel) {
     val context = LocalContext.current as MainActivity
     val preViewModel: PreViewModel = viewModel()
 
     preViewModel.removeView(context)
-    if (preViewModel.shouldOpen) {
+    if (cardViewModel.isOpenPre.value) {
         val color by preViewModel.color
 
         val composeView = ComposeView(context).apply {
@@ -74,22 +71,24 @@ fun PreOverlayView() {
                         .clip(CircleShape)
                         .background(Color(color))
                         .clickable {
-                            preViewModel.onClick(context)
+                            preViewModel.onClick()
                         }
                 ) {}
             }
         }
         preViewModel.addView(context, composeView)
     }
+
+    MaskOverlayView(preViewModel)
 }
 
 @Composable
-fun MaskOverlayView() {
+fun MaskOverlayView(preViewModel: PreViewModel) {
     val context = LocalContext.current as MainActivity
     val maskViewModel: MaskViewModel = viewModel()
 
     maskViewModel.removeView(context)
-    if (maskViewModel.shouldOpen) {
+    if (preViewModel.isOpenMask.value) {
         val composeView = ComposeView(context).apply {
             setViewTreeLifecycleOwner(LocalLifecycleOwner.current)
             setViewTreeSavedStateRegistryOwner(LocalSavedStateRegistryOwner.current)
@@ -107,15 +106,17 @@ fun MaskOverlayView() {
         }
         maskViewModel.addView(context, composeView)
     }
+
+    PointerOverlayView(maskViewModel)
 }
 
 @Composable
-fun PointerOverlayView() {
+fun PointerOverlayView(maskViewModel: MaskViewModel) {
     val context = LocalContext.current as MainActivity
     val pointerViewModel: PointerViewModel = viewModel()
 
     pointerViewModel.removeView(context)
-    if (pointerViewModel.shouldOpen) {
+    if (maskViewModel.isOpenPointer.value) {
         val composeView = ComposeView(context).apply {
             setViewTreeLifecycleOwner(LocalLifecycleOwner.current)
             setViewTreeSavedStateRegistryOwner(LocalSavedStateRegistryOwner.current)
@@ -135,9 +136,10 @@ class AutoClickCardViewModel : CardViewModel() {
     private val activeColor = 0xFF1AEA0B
     private val inactiveColor = 0xFFFF9C1D
 
-    override val title = "连击器"
+    override val title = mutableStateOf("连击器")
     override var description = mutableStateOf(StrUtils.EMPTY)
     override val color = mutableLongStateOf(inactiveColor)
+    val isOpenPre = mutableStateOf(false)
 
     fun onClick(activity: MainActivity) {
         Log.d(TAG, "onClick")
@@ -147,8 +149,10 @@ class AutoClickCardViewModel : CardViewModel() {
                 return
             }
             color.longValue = activeColor
+            isOpenPre.value = true
         } else {
             color.longValue = inactiveColor
+            isOpenPre.value = false
         }
     }
 
@@ -179,25 +183,19 @@ class PreViewModel : ViewModel() {
     private val activeColor = 0xFF1AEA0B
     private val inactiveColor = 0xFFFF9C1D
     private var view = WeakReference<ComposeView>(null)
-    private var isOpen = false
-    var shouldOpen: Boolean
-        get() = isOpen
-        set(value) {
-            isOpen = value
-        }
 
     val color = mutableLongStateOf(inactiveColor)
+    val isOpenMask = mutableStateOf(false)
 
-    fun onClick(activity: MainActivity) {
+    fun onClick() {
         Log.d(TAG, "onClick")
 
-        val maskViewModel = ViewModelProvider(activity)[MaskViewModel::class.java]
         if (color.longValue == inactiveColor) {
-            maskViewModel.shouldOpen = true
             color.longValue = activeColor
+            isOpenMask.value = true
         } else {
-            maskViewModel.shouldOpen = false
             color.longValue = inactiveColor
+            isOpenMask.value = false
         }
     }
 
@@ -223,12 +221,8 @@ class MaskViewModel : ViewModel() {
     }
 
     private var view = WeakReference<ComposeView>(null)
-    private var isOpen = false
-    var shouldOpen: Boolean
-        get() = isOpen
-        set(value) {
-            isOpen = value
-        }
+
+    val isOpenPointer = mutableStateOf(false)
 
     fun addView(activity: MainActivity, composeView: ComposeView) {
         addViewDo(activity, composeView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
@@ -252,12 +246,6 @@ class PointerViewModel : ViewModel() {
     }
 
     private var view = WeakReference<ComposeView>(null)
-    private var isOpen = false
-    var shouldOpen: Boolean
-        get() = isOpen
-        set(value) {
-            isOpen = value
-        }
 
     fun addView(activity: MainActivity, composeView: ComposeView) {
         addViewDo(activity, composeView)
