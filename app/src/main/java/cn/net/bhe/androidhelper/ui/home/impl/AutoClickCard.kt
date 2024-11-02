@@ -97,7 +97,7 @@ fun CtrlOverlayView(ctrlViewModel: CtrlViewModel) {
                     .size(50.dp)
                     .clip(CircleShape)
                     .background(Color(color))
-                    .clickable { ctrlViewModel.onClick() }
+                    .clickable { ctrlViewModel.onClick(context) }
             ) {}
         }
     }
@@ -208,7 +208,7 @@ class CtrlViewModel : ViewModel() {
     val color = mutableLongStateOf(inactiveColor)
     val isOpenMask = mutableStateOf(false)
 
-    fun onClick() {
+    fun onClick(activity: MainActivity) {
         Log.d(TAG, "onClick")
 
         if (color.longValue == inactiveColor) {
@@ -217,6 +217,10 @@ class CtrlViewModel : ViewModel() {
         } else {
             color.longValue = inactiveColor
             isOpenMask.value = false
+
+            val intent = Intent(AutoClickCardViewModel.BC_ACTION)
+            intent.putExtra("action", AutoClickCardViewModel.MSG_ACTION_STOP_CLICK)
+            activity.sendBroadcast(intent)
         }
     }
 
