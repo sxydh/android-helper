@@ -121,7 +121,7 @@ fun CtrlOverlayView(ctrlViewModel: CtrlViewModel) {
             }
         }
 
-        val filter = IntentFilter(MyAccessibilityService.BC_CLICK)
+        val filter = IntentFilter(CtrlViewModel.BC)
         context.registerReceiver(receiver, filter)
 
         onDispose {
@@ -221,6 +221,7 @@ class CtrlViewModel : ViewModel() {
 
     companion object {
         private val TAG: String = AutoClickCardViewModel::class.java.simpleName
+        val BC: String = "${CtrlViewModel::class.java.name}.Broadcast"
     }
 
     private val activeColor = 0xFF1AEA0B
@@ -241,7 +242,7 @@ class CtrlViewModel : ViewModel() {
             color.longValue = inactiveColor
             isOpenMask.value = false
 
-            val intent = Intent(MyAccessibilityService.BC_CLICK)
+            val intent = Intent(MyAccessibilityService.BC)
             intent.putExtra("action", MyAccessibilityService.MSG_ACTION_STOP_CLICK)
             activity.sendBroadcast(intent)
         }
@@ -280,7 +281,7 @@ class MaskViewModel : ViewModel() {
         Log.d(TAG, "onClick")
 
         removeView(activity)
-        val intent = Intent(MyAccessibilityService.BC_CLICK)
+        val intent = Intent(MyAccessibilityService.BC)
         intent.putExtra("action", MyAccessibilityService.MSG_ACTION_AUTO_CLICK)
         intent.putExtra("x", offset.x)
         intent.putExtra("y", offset.y)
@@ -337,7 +338,7 @@ class MyAccessibilityService : AccessibilityService() {
 
     companion object {
         private val TAG: String = MyAccessibilityService::class.java.simpleName
-        val BC_CLICK: String = "${MyAccessibilityService::class.java.name}.Broadcast"
+        val BC: String = "${MyAccessibilityService::class.java.name}.Broadcast"
         const val MSG_ACTION_AUTO_CLICK = "MSG_ACTION_AUTO_CLICK"
         const val MSG_ACTION_STOP_CLICK = "MSG_ACTION_STOP_CLICK"
         private val executor = ThreadPoolExecutor(
@@ -374,7 +375,7 @@ class MyAccessibilityService : AccessibilityService() {
         super.onCreate()
         Log.d(TAG, "onCreate")
 
-        val filter = IntentFilter(BC_CLICK)
+        val filter = IntentFilter(BC)
         registerReceiver(broadcastReceiver, filter)
     }
 
