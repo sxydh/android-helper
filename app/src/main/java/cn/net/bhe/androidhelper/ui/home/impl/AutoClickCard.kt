@@ -364,11 +364,11 @@ class MyAccessibilityService : AccessibilityService() {
 
     private fun onReceiveDo(intent: Intent) {
         action = intent.getStringExtra("action") ?: AutoClickCardViewModel.MSG_ACTION_STOP_CLICK
-        val x = intent.getFloatExtra("x", 0.0f)
-        val y = intent.getFloatExtra("y", 0.0f)
         if (action == AutoClickCardViewModel.MSG_ACTION_AUTO_CLICK) {
             Log.d(TAG, "handleClickJob")
 
+            val x = intent.getFloatExtra("x", 0.0f)
+            val y = intent.getFloatExtra("y", 0.0f)
             handleClickJob(x, y)
         }
     }
