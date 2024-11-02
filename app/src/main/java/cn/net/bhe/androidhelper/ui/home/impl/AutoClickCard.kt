@@ -153,9 +153,6 @@ class AutoClickCardViewModel : CardViewModel() {
 
     companion object {
         private val TAG: String = AutoClickCardViewModel::class.java.simpleName
-        val BC_ACTION: String = "${AutoClickCardViewModel::class.java.name}.Broadcast"
-        const val MSG_ACTION_AUTO_CLICK = "MSG_ACTION_AUTO_CLICK"
-        const val MSG_ACTION_STOP_CLICK = "MSG_ACTION_STOP_CLICK"
     }
 
     private val activeColor = 0xFF1AEA0B
@@ -222,8 +219,8 @@ class CtrlViewModel : ViewModel() {
             color.longValue = inactiveColor
             isOpenMask.value = false
 
-            val intent = Intent(AutoClickCardViewModel.BC_ACTION)
-            intent.putExtra("action", AutoClickCardViewModel.MSG_ACTION_STOP_CLICK)
+            val intent = Intent(MyAccessibilityService.BC_ACTION)
+            intent.putExtra("action", MyAccessibilityService.MSG_ACTION_STOP_CLICK)
             activity.sendBroadcast(intent)
         }
     }
@@ -261,8 +258,8 @@ class MaskViewModel : ViewModel() {
         Log.d(TAG, "onClick")
 
         removeView(activity)
-        val intent = Intent(AutoClickCardViewModel.BC_ACTION)
-        intent.putExtra("action", AutoClickCardViewModel.MSG_ACTION_AUTO_CLICK)
+        val intent = Intent(MyAccessibilityService.BC_ACTION)
+        intent.putExtra("action", MyAccessibilityService.MSG_ACTION_AUTO_CLICK)
         intent.putExtra("x", offset.x)
         intent.putExtra("y", offset.y)
         activity.sendBroadcast(intent)
@@ -318,6 +315,9 @@ class MyAccessibilityService : AccessibilityService() {
 
     companion object {
         private val TAG: String = MyAccessibilityService::class.java.simpleName
+        val BC_ACTION: String = "${MyAccessibilityService::class.java.name}.Broadcast"
+        const val MSG_ACTION_AUTO_CLICK = "MSG_ACTION_AUTO_CLICK"
+        const val MSG_ACTION_STOP_CLICK = "MSG_ACTION_STOP_CLICK"
         private val executor = ThreadPoolExecutor(
             2,
             4,
@@ -344,14 +344,15 @@ class MyAccessibilityService : AccessibilityService() {
             onReceiveDo(intent)
         }
     }
+
     @Volatile
-    private var action = AutoClickCardViewModel.MSG_ACTION_STOP_CLICK
+    private var action = MSG_ACTION_STOP_CLICK
 
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG, "onCreate")
 
-        val filter = IntentFilter(AutoClickCardViewModel.BC_ACTION)
+        val filter = IntentFilter(BC_ACTION)
         registerReceiver(broadcastReceiver, filter)
     }
 
@@ -367,19 +368,22 @@ class MyAccessibilityService : AccessibilityService() {
     }
 
     private fun onReceiveDo(intent: Intent) {
-        action = intent.getStringExtra("action") ?: AutoClickCardViewModel.MSG_ACTION_STOP_CLICK
-        if (action == AutoClickCardViewModel.MSG_ACTION_AUTO_CLICK) {
-            Log.d(TAG, "handleClickJob")
-
+        val actionExtra = intent.getStringExtra("action") ?: MSG_ACTION_STOP_CLICK
+        if (actionExtra == MSG_ACTION_AUTO_CLICK) {
             val x = intent.getFloatExtra("x", 0.0f)
             val y = intent.getFloatExtra("y", 0.0f)
-            handleClickJob(x, y)
+            handleClickJob(actionExtra, x, y)
         }
     }
 
-    private fun handleClickJob(x: Float, y: Float) {
+    private fun handleClickJob(actionExtra: String, x: Float, y: Float) {
+        Log.d(TAG, "handleClickJob")
+
+        if (actionExtra == action) {
+            return
+        }
         executor.submit {
-            while (action == AutoClickCardViewModel.MSG_ACTION_AUTO_CLICK) {
+            while (action == MSG_ACTION_AUTO_CLICK) {
                 val path = Path().apply {
                     moveTo(x, y)
                     lineTo(x, y)
