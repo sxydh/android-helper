@@ -325,7 +325,7 @@ class MyAccessibilityService : AccessibilityService() {
             if (StrUtils.isEmpty(str)) {
                 return false
             }
-            return str.contains(this::class.java.simpleName)
+            return str.contains(MyAccessibilityService::class.java.simpleName)
         }
     }
 
