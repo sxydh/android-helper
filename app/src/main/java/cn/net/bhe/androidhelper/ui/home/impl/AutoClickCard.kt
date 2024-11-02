@@ -66,27 +66,27 @@ fun OverlayView() {
     Log.d("@Composable", "OverlayView")
 
     val cardViewModel: AutoClickCardViewModel = viewModel()
-    val preViewModel: CtrlViewModel = viewModel()
+    val ctrlViewModel: CtrlViewModel = viewModel()
     val maskViewModel: MaskViewModel = viewModel()
     val pointerViewModel: PointerViewModel = viewModel()
 
     if (maskViewModel.isOpenPointer.value) {
         PointerOverlayView(pointerViewModel)
     }
-    if (preViewModel.isOpenMask.value) {
+    if (ctrlViewModel.isOpenMask.value) {
         MaskOverlayView(maskViewModel)
     }
     if (cardViewModel.isOpenCtrl.value) {
-        CtrlOverlayView(preViewModel)
+        CtrlOverlayView(ctrlViewModel)
     }
 }
 
 @Composable
-fun CtrlOverlayView(preViewModel: CtrlViewModel) {
+fun CtrlOverlayView(ctrlViewModel: CtrlViewModel) {
     Log.d("@Composable", "CtrlOverlayView")
 
     val context = LocalContext.current as MainActivity
-    val color by preViewModel.color
+    val color by ctrlViewModel.color
 
     val composeView = ComposeView(context).apply {
         setViewTreeLifecycleOwner(LocalLifecycleOwner.current)
@@ -97,12 +97,12 @@ fun CtrlOverlayView(preViewModel: CtrlViewModel) {
                     .size(50.dp)
                     .clip(CircleShape)
                     .background(Color(color))
-                    .clickable { preViewModel.onClick() }
+                    .clickable { ctrlViewModel.onClick() }
             ) {}
         }
     }
-    preViewModel.removeView(context)
-    preViewModel.addView(context, composeView)
+    ctrlViewModel.removeView(context)
+    ctrlViewModel.addView(context, composeView)
 }
 
 @Composable
