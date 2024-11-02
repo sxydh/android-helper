@@ -255,7 +255,6 @@ class CtrlViewModel : ViewModel() {
         view = WeakReference(composeView)
 
         val filter = IntentFilter(BC)
-        activity.unregisterReceiver(receiver)
         activity.registerReceiver(receiver, filter)
     }
 
