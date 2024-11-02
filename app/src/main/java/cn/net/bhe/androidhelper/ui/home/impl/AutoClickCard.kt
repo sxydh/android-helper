@@ -120,10 +120,6 @@ fun CtrlOverlayView(ctrlViewModel: CtrlViewModel) {
 fun MaskOverlayView(maskViewModel: MaskViewModel) {
     Log.d("@Composable", "MaskOverlayView")
 
-    if (!maskViewModel.isAddView()) {
-        return
-    }
-
     val context = LocalContext.current as MainActivity
 
     val composeView = ComposeView(context).apply {
@@ -141,16 +137,18 @@ fun MaskOverlayView(maskViewModel: MaskViewModel) {
             ) {}
         }
     }
-    maskViewModel.addView(context, composeView)
+
+    DisposableEffect(Unit) {
+        maskViewModel.addView(context, composeView)
+        onDispose {
+            maskViewModel.removeView(context)
+        }
+    }
 }
 
 @Composable
 fun PointerOverlayView(pointerViewModel: PointerViewModel) {
     Log.d("@Composable", "PointerOverlayView")
-
-    if (!pointerViewModel.isAddView()) {
-        return
-    }
 
     val context = LocalContext.current as MainActivity
 
@@ -159,7 +157,13 @@ fun PointerOverlayView(pointerViewModel: PointerViewModel) {
         setViewTreeSavedStateRegistryOwner(LocalSavedStateRegistryOwner.current)
         setContent { }
     }
-    pointerViewModel.addView(context, composeView)
+
+    DisposableEffect(Unit) {
+        pointerViewModel.addView(context, composeView)
+        onDispose {
+            pointerViewModel.removeView(context)
+        }
+    }
 }
 
 class AutoClickCardViewModel : CardViewModel() {
@@ -292,10 +296,6 @@ class MaskViewModel : ViewModel() {
         activity.sendBroadcast(intent)
     }
 
-    fun isAddView(): Boolean {
-        return view.get() == null
-    }
-
     fun addView(activity: MainActivity, composeView: ComposeView) {
         Log.d(TAG, "addView")
 
@@ -303,7 +303,7 @@ class MaskViewModel : ViewModel() {
         view = WeakReference(composeView)
     }
 
-    private fun removeView(activity: MainActivity) {
+    fun removeView(activity: MainActivity) {
         Log.d(TAG, "removeView")
 
         view.get()?.let {
@@ -323,15 +323,21 @@ class PointerViewModel : ViewModel() {
 
     private var view = WeakReference<ComposeView>(null)
 
-    fun isAddView(): Boolean {
-        return view.get() == null
-    }
-
     fun addView(activity: MainActivity, composeView: ComposeView) {
         Log.d(TAG, "addView")
 
         addViewDo(activity, composeView)
         view = WeakReference(composeView)
+    }
+
+    fun removeView(activity: MainActivity) {
+        Log.d(TAG, "removeView")
+
+        view.get()?.let {
+            val windowManager = activity.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            windowManager.removeView(it)
+            view = WeakReference(null)
+        }
     }
 
 }
