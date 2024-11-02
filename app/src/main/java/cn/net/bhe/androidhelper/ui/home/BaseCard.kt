@@ -28,7 +28,7 @@ import cn.net.bhe.mutil.StrUtils
 @Composable
 fun BaseCard(cardViewModel: CardViewModel, onClick: () -> Unit) {
 
-    val title = cardViewModel.title
+    val title by cardViewModel.title
     val description by cardViewModel.description
     val color by cardViewModel.color
 
@@ -71,7 +71,7 @@ fun BaseCard(cardViewModel: CardViewModel, onClick: () -> Unit) {
 
 abstract class CardViewModel : ViewModel() {
 
-    abstract val title: String
+    abstract val title: MutableState<String>
     abstract val description: MutableState<String>
     abstract val color: MutableState<Long>
 
