@@ -66,7 +66,7 @@ fun OverlayView() {
     Log.d("@Composable", "OverlayView")
 
     val cardViewModel: AutoClickCardViewModel = viewModel()
-    val preViewModel: PreViewModel = viewModel()
+    val preViewModel: CtrlViewModel = viewModel()
     val maskViewModel: MaskViewModel = viewModel()
     val pointerViewModel: PointerViewModel = viewModel()
 
@@ -76,14 +76,14 @@ fun OverlayView() {
     if (preViewModel.isOpenMask.value) {
         MaskOverlayView(maskViewModel)
     }
-    if (cardViewModel.isOpenPre.value) {
-        PreOverlayView(preViewModel)
+    if (cardViewModel.isOpenCtrl.value) {
+        CtrlOverlayView(preViewModel)
     }
 }
 
 @Composable
-fun PreOverlayView(preViewModel: PreViewModel) {
-    Log.d("@Composable", "PreOverlayView")
+fun CtrlOverlayView(preViewModel: CtrlViewModel) {
+    Log.d("@Composable", "CtrlOverlayView")
 
     val context = LocalContext.current as MainActivity
     val color by preViewModel.color
@@ -160,7 +160,7 @@ class AutoClickCardViewModel : CardViewModel() {
     override val title = mutableStateOf("连击器")
     override var description = mutableStateOf(StrUtils.EMPTY)
     override val color = mutableLongStateOf(inactiveColor)
-    val isOpenPre = mutableStateOf(false)
+    val isOpenCtrl = mutableStateOf(false)
 
     fun onClick(activity: MainActivity) {
         Log.d(TAG, "onClick")
@@ -170,10 +170,10 @@ class AutoClickCardViewModel : CardViewModel() {
                 return
             }
             color.longValue = activeColor
-            isOpenPre.value = true
+            isOpenCtrl.value = true
         } else {
             color.longValue = inactiveColor
-            isOpenPre.value = false
+            isOpenCtrl.value = false
         }
     }
 
@@ -195,7 +195,7 @@ class AutoClickCardViewModel : CardViewModel() {
 
 }
 
-class PreViewModel : ViewModel() {
+class CtrlViewModel : ViewModel() {
 
     companion object {
         private val TAG: String = AutoClickCardViewModel::class.java.simpleName
