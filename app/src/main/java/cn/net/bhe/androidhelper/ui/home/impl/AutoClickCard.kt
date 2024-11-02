@@ -336,6 +336,7 @@ class MyAccessibilityService : AccessibilityService() {
             onReceiveDo(intent)
         }
     }
+    @Volatile
     private var action = AutoClickCardViewModel.MSG_ACTION_STOP_CLICK
 
     override fun onCreate() {
