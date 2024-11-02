@@ -22,10 +22,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -67,21 +67,17 @@ fun AutoClickCard() {
 fun OverlayView() {
     Log.d("@Composable", "OverlayView")
 
-    val context = LocalContext.current as MainActivity
     val cardViewModel: AutoClickCardViewModel = viewModel()
     val ctrlViewModel: CtrlViewModel = viewModel()
     val maskViewModel: MaskViewModel = viewModel()
     val pointerViewModel: PointerViewModel = viewModel()
 
-    pointerViewModel.removeView(context)
     if (maskViewModel.isOpenPointer.value) {
         PointerOverlayView(pointerViewModel)
     }
-    maskViewModel.removeView(context)
     if (ctrlViewModel.isOpenMask.value) {
         MaskOverlayView(maskViewModel)
     }
-    ctrlViewModel.removeView(context)
     if (cardViewModel.isOpenCtrl.value) {
         CtrlOverlayView(ctrlViewModel)
     }
@@ -90,6 +86,10 @@ fun OverlayView() {
 @Composable
 fun CtrlOverlayView(ctrlViewModel: CtrlViewModel) {
     Log.d("@Composable", "CtrlOverlayView")
+
+    if (!ctrlViewModel.isAddView()) {
+        return
+    }
 
     val context = LocalContext.current as MainActivity
     val description by ctrlViewModel.description
@@ -106,33 +106,20 @@ fun CtrlOverlayView(ctrlViewModel: CtrlViewModel) {
                     .background(Color(color))
                     .clickable { ctrlViewModel.onClick(context) }
             ) {
-                Text(text = description)
+                Text(text = description, modifier = Modifier.align(Alignment.Center))
             }
         }
     }
-    ctrlViewModel.removeView(context)
     ctrlViewModel.addView(context, composeView)
-
-    // TODO
-    DisposableEffect(Unit) {
-        val receiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-
-            }
-        }
-
-        val filter = IntentFilter(CtrlViewModel.BC)
-        context.registerReceiver(receiver, filter)
-
-        onDispose {
-            context.unregisterReceiver(receiver)
-        }
-    }
 }
 
 @Composable
 fun MaskOverlayView(maskViewModel: MaskViewModel) {
     Log.d("@Composable", "MaskOverlayView")
+
+    if (!maskViewModel.isAddView()) {
+        return
+    }
 
     val context = LocalContext.current as MainActivity
 
@@ -151,13 +138,16 @@ fun MaskOverlayView(maskViewModel: MaskViewModel) {
             ) {}
         }
     }
-    maskViewModel.removeView(context)
     maskViewModel.addView(context, composeView)
 }
 
 @Composable
 fun PointerOverlayView(pointerViewModel: PointerViewModel) {
     Log.d("@Composable", "PointerOverlayView")
+
+    if (!pointerViewModel.isAddView()) {
+        return
+    }
 
     val context = LocalContext.current as MainActivity
 
@@ -166,7 +156,6 @@ fun PointerOverlayView(pointerViewModel: PointerViewModel) {
         setViewTreeSavedStateRegistryOwner(LocalSavedStateRegistryOwner.current)
         setContent { }
     }
-    pointerViewModel.removeView(context)
     pointerViewModel.addView(context, composeView)
 }
 
@@ -222,11 +211,18 @@ class CtrlViewModel : ViewModel() {
     companion object {
         private val TAG: String = AutoClickCardViewModel::class.java.simpleName
         val BC: String = "${CtrlViewModel::class.java.name}.Broadcast"
+        const val MSG_ACTION_CLICK_COUNT = "MSG_ACTION_CLICK_COUNT"
     }
 
     private val activeColor = 0xFF1AEA0B
     private val inactiveColor = 0xFFFF9C1D
     private var view = WeakReference<ComposeView>(null)
+    private val receiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val count = intent.getIntExtra("count", 0)
+            description.value = count.toString()
+        }
+    }
 
     val color = mutableLongStateOf(inactiveColor)
     val description = mutableStateOf(StrUtils.EMPTY)
@@ -248,21 +244,19 @@ class CtrlViewModel : ViewModel() {
         }
     }
 
+    fun isAddView(): Boolean {
+        return view.get() == null
+    }
+
     fun addView(activity: MainActivity, composeView: ComposeView) {
         Log.d(TAG, "addView")
 
         addViewDo(activity, composeView)
         view = WeakReference(composeView)
-    }
 
-    fun removeView(activity: MainActivity) {
-        Log.d(TAG, "removeView")
-
-        view.get()?.let {
-            val windowManager = activity.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-            windowManager.removeView(it)
-            view = WeakReference(null)
-        }
+        val filter = IntentFilter(BC)
+        activity.unregisterReceiver(receiver)
+        activity.registerReceiver(receiver, filter)
     }
 
 }
@@ -288,6 +282,10 @@ class MaskViewModel : ViewModel() {
         activity.sendBroadcast(intent)
     }
 
+    fun isAddView(): Boolean {
+        return view.get() == null
+    }
+
     fun addView(activity: MainActivity, composeView: ComposeView) {
         Log.d(TAG, "addView")
 
@@ -295,7 +293,7 @@ class MaskViewModel : ViewModel() {
         view = WeakReference(composeView)
     }
 
-    fun removeView(activity: MainActivity) {
+    private fun removeView(activity: MainActivity) {
         Log.d(TAG, "removeView")
 
         view.get()?.let {
@@ -315,21 +313,15 @@ class PointerViewModel : ViewModel() {
 
     private var view = WeakReference<ComposeView>(null)
 
+    fun isAddView(): Boolean {
+        return view.get() == null
+    }
+
     fun addView(activity: MainActivity, composeView: ComposeView) {
         Log.d(TAG, "addView")
 
         addViewDo(activity, composeView)
         view = WeakReference(composeView)
-    }
-
-    fun removeView(activity: MainActivity) {
-        Log.d(TAG, "removeView")
-
-        view.get()?.let {
-            val windowManager = activity.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-            windowManager.removeView(it)
-            view = WeakReference(null)
-        }
     }
 
 }
@@ -360,7 +352,7 @@ class MyAccessibilityService : AccessibilityService() {
         }
     }
 
-    private val broadcastReceiver = object : BroadcastReceiver() {
+    private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             Log.d(TAG, "onReceive")
 
@@ -369,14 +361,14 @@ class MyAccessibilityService : AccessibilityService() {
     }
 
     @Volatile
-    private var action = MSG_ACTION_STOP_CLICK
+    private var clickJobFlag = MSG_ACTION_STOP_CLICK
 
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG, "onCreate")
 
         val filter = IntentFilter(BC)
-        registerReceiver(broadcastReceiver, filter)
+        registerReceiver(receiver, filter)
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {}
@@ -387,32 +379,33 @@ class MyAccessibilityService : AccessibilityService() {
         super.onDestroy()
         Log.d(TAG, "onDestroy")
 
-        unregisterReceiver(broadcastReceiver)
+        unregisterReceiver(receiver)
     }
 
     private fun onReceiveDo(intent: Intent) {
-        val actionExtra = intent.getStringExtra("action") ?: MSG_ACTION_STOP_CLICK
-        if (actionExtra == MSG_ACTION_AUTO_CLICK) {
+        val action = intent.getStringExtra("action") ?: MSG_ACTION_STOP_CLICK
+        if (action == MSG_ACTION_AUTO_CLICK) {
             val x = intent.getFloatExtra("x", 0.0f)
             val y = intent.getFloatExtra("y", 0.0f)
             handleAutoClickJob(x, y)
             return
         }
-        if (actionExtra == MSG_ACTION_STOP_CLICK) {
+        if (action == MSG_ACTION_STOP_CLICK) {
             handleStopClickJob()
             return
         }
     }
 
     private fun handleAutoClickJob(x: Float, y: Float) {
-        if (action == MSG_ACTION_AUTO_CLICK) {
+        if (clickJobFlag == MSG_ACTION_AUTO_CLICK) {
             return
         }
-        action = MSG_ACTION_AUTO_CLICK
+        clickJobFlag = MSG_ACTION_AUTO_CLICK
         executor.submit {
             Log.d(TAG, "submit")
 
-            while (action == MSG_ACTION_AUTO_CLICK) {
+            var count = 0
+            while (clickJobFlag == MSG_ACTION_AUTO_CLICK) {
                 val path = Path().apply {
                     moveTo(x, y)
                     lineTo(x, y)
@@ -421,13 +414,18 @@ class MyAccessibilityService : AccessibilityService() {
                     .addStroke(GestureDescription.StrokeDescription(path, 0L, 1))
                     .build()
                 dispatchGesture(gesture, null, null)
-                Thread.sleep(100)
+
+                val intent = Intent(CtrlViewModel.BC)
+                intent.putExtra("action", CtrlViewModel.MSG_ACTION_CLICK_COUNT)
+                intent.putExtra("count", ++count)
+                sendBroadcast(intent)
+                Thread.sleep(300)
             }
         }
     }
 
     private fun handleStopClickJob() {
-        action = MSG_ACTION_STOP_CLICK
+        clickJobFlag = MSG_ACTION_STOP_CLICK
     }
 
 }
