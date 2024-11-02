@@ -49,81 +49,85 @@ fun AutoClickCard() {
     BaseCard(cardViewModel) {
         cardViewModel.onClick(context)
     }
-    PreOverlayView(cardViewModel)
+    OverlayView(cardViewModel)
 }
 
 @Composable
-fun PreOverlayView(cardViewModel: AutoClickCardViewModel) {
+fun OverlayView(cardViewModel: AutoClickCardViewModel) {
     val context = LocalContext.current as MainActivity
     val preViewModel: PreViewModel = viewModel()
-
-    preViewModel.removeView(context)
-    if (cardViewModel.isOpenPre.value) {
-        val color by preViewModel.color
-
-        val composeView = ComposeView(context).apply {
-            setViewTreeLifecycleOwner(LocalLifecycleOwner.current)
-            setViewTreeSavedStateRegistryOwner(LocalSavedStateRegistryOwner.current)
-            setContent {
-                Box(
-                    modifier = Modifier
-                        .size(50.dp)
-                        .clip(CircleShape)
-                        .background(Color(color))
-                        .clickable {
-                            preViewModel.onClick()
-                        }
-                ) {}
-            }
-        }
-        preViewModel.addView(context, composeView)
-    }
-
-    MaskOverlayView(preViewModel)
-}
-
-@Composable
-fun MaskOverlayView(preViewModel: PreViewModel) {
-    val context = LocalContext.current as MainActivity
     val maskViewModel: MaskViewModel = viewModel()
-
-    maskViewModel.removeView(context)
-    if (preViewModel.isOpenMask.value) {
-        val composeView = ComposeView(context).apply {
-            setViewTreeLifecycleOwner(LocalLifecycleOwner.current)
-            setViewTreeSavedStateRegistryOwner(LocalSavedStateRegistryOwner.current)
-            setContent {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .pointerInput(Unit) {
-                            detectTapGestures { offset: Offset ->
-                                println("${offset.x}, ${offset.y}")
-                            }
-                        }
-                ) {}
-            }
-        }
-        maskViewModel.addView(context, composeView)
-    }
-
-    PointerOverlayView(maskViewModel)
-}
-
-@Composable
-fun PointerOverlayView(maskViewModel: MaskViewModel) {
-    val context = LocalContext.current as MainActivity
     val pointerViewModel: PointerViewModel = viewModel()
 
     pointerViewModel.removeView(context)
     if (maskViewModel.isOpenPointer.value) {
-        val composeView = ComposeView(context).apply {
-            setViewTreeLifecycleOwner(LocalLifecycleOwner.current)
-            setViewTreeSavedStateRegistryOwner(LocalSavedStateRegistryOwner.current)
-            setContent { }
-        }
-        pointerViewModel.addView(context, composeView)
+        PointerOverlayView(pointerViewModel)
     }
+
+    maskViewModel.removeView(context)
+    if (preViewModel.isOpenMask.value) {
+        MaskOverlayView(maskViewModel)
+    }
+
+    preViewModel.removeView(context)
+    if (cardViewModel.isOpenPre.value) {
+        PreOverlayView(preViewModel)
+    }
+}
+
+@Composable
+fun PreOverlayView(preViewModel: PreViewModel) {
+    val context = LocalContext.current as MainActivity
+    val color by preViewModel.color
+
+    val composeView = ComposeView(context).apply {
+        setViewTreeLifecycleOwner(LocalLifecycleOwner.current)
+        setViewTreeSavedStateRegistryOwner(LocalSavedStateRegistryOwner.current)
+        setContent {
+            Box(
+                modifier = Modifier
+                    .size(50.dp)
+                    .clip(CircleShape)
+                    .background(Color(color))
+                    .clickable { preViewModel.onClick() }
+            ) {}
+        }
+    }
+    preViewModel.addView(context, composeView)
+}
+
+@Composable
+fun MaskOverlayView(maskViewModel: MaskViewModel) {
+    val context = LocalContext.current as MainActivity
+
+    val composeView = ComposeView(context).apply {
+        setViewTreeLifecycleOwner(LocalLifecycleOwner.current)
+        setViewTreeSavedStateRegistryOwner(LocalSavedStateRegistryOwner.current)
+        setContent {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .pointerInput(Unit) {
+                        detectTapGestures { offset: Offset ->
+                            println("${offset.x}, ${offset.y}")
+                        }
+                    }
+            ) {}
+        }
+    }
+    maskViewModel.addView(context, composeView)
+}
+
+@Composable
+fun PointerOverlayView(pointerViewModel: PointerViewModel) {
+    val context = LocalContext.current as MainActivity
+
+    val composeView = ComposeView(context).apply {
+        setViewTreeLifecycleOwner(LocalLifecycleOwner.current)
+        setViewTreeSavedStateRegistryOwner(LocalSavedStateRegistryOwner.current)
+        setContent { }
+    }
+    pointerViewModel.addView(context, composeView)
 }
 
 class AutoClickCardViewModel : CardViewModel() {
