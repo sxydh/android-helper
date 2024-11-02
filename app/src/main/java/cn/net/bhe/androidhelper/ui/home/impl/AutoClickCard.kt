@@ -39,6 +39,7 @@ import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import cn.net.bhe.androidhelper.MainActivity
 import cn.net.bhe.androidhelper.ui.home.BaseCard
 import cn.net.bhe.androidhelper.ui.home.CardViewModel
+import cn.net.bhe.androidhelper.ui.home.impl.PreViewModel.Companion
 import cn.net.bhe.mutil.StrUtils
 import java.lang.ref.WeakReference
 
@@ -227,6 +228,10 @@ class MaskViewModel : ViewModel() {
     private var view = WeakReference<ComposeView>(null)
 
     val isOpenPointer = mutableStateOf(false)
+
+    fun onClick() {
+        Log.d(TAG, "onClick")
+    }
 
     fun addView(activity: MainActivity, composeView: ComposeView) {
         addViewDo(activity, composeView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
