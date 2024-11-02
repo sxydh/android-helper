@@ -1,10 +1,12 @@
 package cn.net.bhe.androidhelper.ui.home.impl
 
 import android.accessibilityservice.AccessibilityService
+import android.accessibilityservice.GestureDescription
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Path
 import android.net.Uri
 import android.provider.Settings
 import android.util.Log
@@ -41,35 +43,37 @@ import cn.net.bhe.androidhelper.ui.home.BaseCard
 import cn.net.bhe.androidhelper.ui.home.CardViewModel
 import cn.net.bhe.mutil.StrUtils
 import java.lang.ref.WeakReference
+import java.util.concurrent.ArrayBlockingQueue
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 
 @Composable
 fun AutoClickCard() {
+    Log.d("@Composable", "AutoClickCard")
+
     val context = LocalContext.current as MainActivity
     val cardViewModel: AutoClickCardViewModel = viewModel()
     BaseCard(cardViewModel) {
         cardViewModel.onClick(context)
     }
-    OverlayView(cardViewModel)
+    OverlayView()
 }
 
 @Composable
-fun OverlayView(cardViewModel: AutoClickCardViewModel) {
-    val context = LocalContext.current as MainActivity
+fun OverlayView() {
+    Log.d("@Composable", "OverlayView")
+
+    val cardViewModel: AutoClickCardViewModel = viewModel()
     val preViewModel: PreViewModel = viewModel()
     val maskViewModel: MaskViewModel = viewModel()
     val pointerViewModel: PointerViewModel = viewModel()
 
-    pointerViewModel.removeView(context)
     if (maskViewModel.isOpenPointer.value) {
         PointerOverlayView(pointerViewModel)
     }
-
-    maskViewModel.removeView(context)
     if (preViewModel.isOpenMask.value) {
         MaskOverlayView(maskViewModel)
     }
-
-    preViewModel.removeView(context)
     if (cardViewModel.isOpenPre.value) {
         PreOverlayView(preViewModel)
     }
@@ -77,6 +81,8 @@ fun OverlayView(cardViewModel: AutoClickCardViewModel) {
 
 @Composable
 fun PreOverlayView(preViewModel: PreViewModel) {
+    Log.d("@Composable", "PreOverlayView")
+
     val context = LocalContext.current as MainActivity
     val color by preViewModel.color
 
@@ -93,11 +99,14 @@ fun PreOverlayView(preViewModel: PreViewModel) {
             ) {}
         }
     }
+    preViewModel.removeView(context)
     preViewModel.addView(context, composeView)
 }
 
 @Composable
 fun MaskOverlayView(maskViewModel: MaskViewModel) {
+    Log.d("@Composable", "MaskOverlayView")
+
     val context = LocalContext.current as MainActivity
 
     val composeView = ComposeView(context).apply {
@@ -109,17 +118,20 @@ fun MaskOverlayView(maskViewModel: MaskViewModel) {
                     .fillMaxSize()
                     .pointerInput(Unit) {
                         detectTapGestures { offset: Offset ->
-                            maskViewModel.onClick(offset)
+                            maskViewModel.onClick(context, offset)
                         }
                     }
             ) {}
         }
     }
+    maskViewModel.removeView(context)
     maskViewModel.addView(context, composeView)
 }
 
 @Composable
 fun PointerOverlayView(pointerViewModel: PointerViewModel) {
+    Log.d("@Composable", "PointerOverlayView")
+
     val context = LocalContext.current as MainActivity
 
     val composeView = ComposeView(context).apply {
@@ -127,6 +139,7 @@ fun PointerOverlayView(pointerViewModel: PointerViewModel) {
         setViewTreeSavedStateRegistryOwner(LocalSavedStateRegistryOwner.current)
         setContent { }
     }
+    pointerViewModel.removeView(context)
     pointerViewModel.addView(context, composeView)
 }
 
@@ -134,7 +147,9 @@ class AutoClickCardViewModel : CardViewModel() {
 
     companion object {
         private val TAG: String = AutoClickCardViewModel::class.java.simpleName
-        val BC_ID: String = "${AutoClickCardViewModel::class.java.name}.onClick"
+        val BC_ACTION: String = "${AutoClickCardViewModel::class.java.name}.Broadcast"
+        const val MSG_ACTION_AUTO_CLICK = "MSG_ACTION_AUTO_CLICK"
+        const val MSG_ACTION_STOP_CLICK = "MSG_ACTION_STOP_CLICK"
     }
 
     private val activeColor = 0xFF1AEA0B
@@ -168,8 +183,8 @@ class AutoClickCardViewModel : CardViewModel() {
             activity.startActivity(intent)
             return false
         }
-        if (!MyAccessibilityService.isAccessibilityServiceEnabled(activity, MyAccessibilityService::class.java)) {
-            val intent = Intent(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+        if (!MyAccessibilityService.isAccessibilityServiceEnabled(activity)) {
+            val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
             activity.startActivity(intent)
             return false
         }
@@ -204,11 +219,15 @@ class PreViewModel : ViewModel() {
     }
 
     fun addView(activity: MainActivity, composeView: ComposeView) {
+        Log.d(TAG, "addView")
+
         addViewDo(activity, composeView)
         view = WeakReference(composeView)
     }
 
     fun removeView(activity: MainActivity) {
+        Log.d(TAG, "removeView")
+
         view.get()?.let {
             val windowManager = activity.getSystemService(Context.WINDOW_SERVICE) as WindowManager
             windowManager.removeView(it)
@@ -228,18 +247,27 @@ class MaskViewModel : ViewModel() {
 
     val isOpenPointer = mutableStateOf(false)
 
-    fun onClick(offset: Offset) {
+    fun onClick(activity: MainActivity, offset: Offset) {
         Log.d(TAG, "onClick")
 
-        println("${offset.x}, ${offset.y}")
+        removeView(activity)
+        val intent = Intent(AutoClickCardViewModel.BC_ACTION)
+        intent.putExtra("action", AutoClickCardViewModel.MSG_ACTION_AUTO_CLICK)
+        intent.putExtra("x", offset.x)
+        intent.putExtra("y", offset.y)
+        activity.sendBroadcast(intent)
     }
 
     fun addView(activity: MainActivity, composeView: ComposeView) {
+        Log.d(TAG, "addView")
+
         addViewDo(activity, composeView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
         view = WeakReference(composeView)
     }
 
     fun removeView(activity: MainActivity) {
+        Log.d(TAG, "removeView")
+
         view.get()?.let {
             val windowManager = activity.getSystemService(Context.WINDOW_SERVICE) as WindowManager
             windowManager.removeView(it)
@@ -251,14 +279,22 @@ class MaskViewModel : ViewModel() {
 
 class PointerViewModel : ViewModel() {
 
+    companion object {
+        private val TAG: String = PointerViewModel::class.java.simpleName
+    }
+
     private var view = WeakReference<ComposeView>(null)
 
     fun addView(activity: MainActivity, composeView: ComposeView) {
+        Log.d(TAG, "addView")
+
         addViewDo(activity, composeView)
         view = WeakReference(composeView)
     }
 
     fun removeView(activity: MainActivity) {
+        Log.d(TAG, "removeView")
+
         view.get()?.let {
             val windowManager = activity.getSystemService(Context.WINDOW_SERVICE) as WindowManager
             windowManager.removeView(it)
@@ -272,13 +308,14 @@ class MyAccessibilityService : AccessibilityService() {
 
     companion object {
         private val TAG: String = MyAccessibilityService::class.java.simpleName
+        private val executor = ThreadPoolExecutor(2, 4, 1000, TimeUnit.MILLISECONDS, ArrayBlockingQueue(8))
 
-        fun isAccessibilityServiceEnabled(context: Context, service: Class<out AccessibilityService>): Boolean {
+        fun isAccessibilityServiceEnabled(context: Context): Boolean {
             val str = Settings.Secure.getString(context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
             if (StrUtils.isEmpty(str)) {
                 return false
             }
-            return str.contains(service.simpleName)
+            return str.contains(this::class.java.simpleName)
         }
     }
 
@@ -286,15 +323,16 @@ class MyAccessibilityService : AccessibilityService() {
         override fun onReceive(context: Context, intent: Intent) {
             Log.d(TAG, "onReceive")
 
-            onReceiveDo(context)
+            onReceiveDo(intent)
         }
     }
+    private var action = AutoClickCardViewModel.MSG_ACTION_STOP_CLICK
 
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG, "onCreate")
 
-        val filter = IntentFilter(AutoClickCardViewModel.BC_ID)
+        val filter = IntentFilter(AutoClickCardViewModel.BC_ACTION)
         registerReceiver(broadcastReceiver, filter)
     }
 
@@ -309,8 +347,29 @@ class MyAccessibilityService : AccessibilityService() {
         unregisterReceiver(broadcastReceiver)
     }
 
-    private fun onReceiveDo(context: Context) {
-        Log.d(TAG, "onReceiveDo")
+    private fun onReceiveDo(intent: Intent) {
+        action = intent.getStringExtra("action") ?: AutoClickCardViewModel.MSG_ACTION_STOP_CLICK
+        val x = intent.getFloatExtra("x", 0.0f)
+        val y = intent.getFloatExtra("y", 0.0f)
+        if (action == AutoClickCardViewModel.MSG_ACTION_AUTO_CLICK) {
+            handleClickJob(x, y)
+        }
+    }
+
+    private fun handleClickJob(x: Float, y: Float) {
+        executor.submit {
+            while (action == AutoClickCardViewModel.MSG_ACTION_AUTO_CLICK) {
+                val path = Path().apply {
+                    moveTo(x, y)
+                    lineTo(x, y)
+                }
+                val gesture = GestureDescription.Builder()
+                    .addStroke(GestureDescription.StrokeDescription(path, 0L, 1))
+                    .build()
+                dispatchGesture(gesture, null, null)
+                Thread.sleep(100)
+            }
+        }
     }
 
 }
