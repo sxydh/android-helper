@@ -71,6 +71,9 @@ fun BaseCard(cardViewModel: CardViewModel, onClick: () -> Unit) {
 
 abstract class CardViewModel : ViewModel() {
 
+    protected val activeColor = 0xFF1AEA0B
+    protected val inactiveColor = 0xFFFF9C1D
+
     abstract val title: MutableState<String>
     abstract val description: MutableState<String>
     abstract val color: MutableState<Long>

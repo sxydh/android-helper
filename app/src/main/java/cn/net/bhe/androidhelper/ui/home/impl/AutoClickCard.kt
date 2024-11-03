@@ -173,9 +173,6 @@ class AutoClickCardViewModel : CardViewModel() {
         private val TAG: String = AutoClickCardViewModel::class.java.simpleName
     }
 
-    private val activeColor = 0xFF1AEA0B
-    private val inactiveColor = 0xFFFF9C1D
-
     override val title = mutableStateOf("连击器")
     override var description = mutableStateOf(StrUtils.EMPTY)
     override val color = mutableLongStateOf(inactiveColor)

@@ -28,8 +28,6 @@ fun FileServerCard() {
 
 class FileServerCardViewModel : CardViewModel() {
 
-    private val activeColor = 0xFF1AEA0B
-    private val inactiveColor = 0xFFFF9C1D
     private var ip: String = StrUtils.EMPTY
     private val port = 34567
     private var username: String = StrUtils.EMPTY
