@@ -219,8 +219,8 @@ class CtrlViewModel : ViewModel() {
         const val MSG_ACTION_CLICK_COUNT = "MSG_ACTION_CLICK_COUNT"
     }
 
-    private val activeColor = 0xFF1AEA0B
-    private val inactiveColor = 0x00000000L
+    private val activeColor = 0xFFF4511E
+    private val inactiveColor = 0xFF039BE5
     private var view = WeakReference<ComposeView>(null)
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
