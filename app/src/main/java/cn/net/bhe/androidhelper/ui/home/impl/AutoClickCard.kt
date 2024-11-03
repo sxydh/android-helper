@@ -173,7 +173,7 @@ class AutoClickCardViewModel : CardViewModel() {
         private val TAG: String = AutoClickCardViewModel::class.java.simpleName
     }
 
-    override val title = mutableStateOf("连击器")
+    override val title = mutableStateOf("Auto Clicker")
     override var description = mutableStateOf(StrUtils.EMPTY)
     override val color = mutableLongStateOf(inactiveColor)
     val isOpenCtrl = mutableStateOf(false)
