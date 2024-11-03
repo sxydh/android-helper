@@ -11,7 +11,7 @@ android {
         applicationId = "cn.net.bhe.androidhelper"
         minSdk = 33
         targetSdk = 34
-        versionCode = 2
+        versionCode = 3
         versionName = "2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
