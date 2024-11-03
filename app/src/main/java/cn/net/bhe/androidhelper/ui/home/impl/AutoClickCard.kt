@@ -220,7 +220,7 @@ class CtrlViewModel : ViewModel() {
     }
 
     private val activeColor = 0xFF1AEA0B
-    private val inactiveColor = 0xFFFF9C1D
+    private val inactiveColor = 0x00000000L
     private var view = WeakReference<ComposeView>(null)
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
