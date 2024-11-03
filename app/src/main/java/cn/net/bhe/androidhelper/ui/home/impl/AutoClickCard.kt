@@ -4,6 +4,7 @@ import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.GestureDescription
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Context.RECEIVER_EXPORTED
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Path
@@ -258,7 +259,7 @@ class CtrlViewModel : ViewModel() {
         view = WeakReference(composeView)
 
         val filter = IntentFilter(BC)
-        activity.registerReceiver(receiver, filter)
+        activity.registerReceiver(receiver, filter, RECEIVER_EXPORTED)
     }
 
     fun removeView(activity: MainActivity) {
@@ -384,7 +385,7 @@ class MyAccessibilityService : AccessibilityService() {
         Log.d(TAG, "onCreate")
 
         val filter = IntentFilter(BC)
-        registerReceiver(receiver, filter)
+        registerReceiver(receiver, filter, RECEIVER_EXPORTED)
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {}
